@@ -5,8 +5,8 @@ import 'core/theme/app_theme.dart';
 import 'data/repositories/in_memory_parenthood_repository.dart';
 import 'data/repositories/parenthood_repository.dart';
 import 'features/birth_trigger/bloc/birth_trigger_bloc.dart';
-import 'features/home/home_screen.dart';
 import 'features/profile_switch/bloc/profile_switch_bloc.dart';
+import 'features/shell/main_shell.dart';
 
 void main() {
   // Демо-режим: in-memory репозиторий (без бэкенда).
@@ -38,7 +38,7 @@ class MaMaApp extends StatelessWidget {
           title: 'MaMa',
           debugShowCheckedModeBanner: false,
           theme: AppTheme.pregnancy(),
-          home: const HomeScreen(),
+          home: const MainShell(),
         ),
       ),
     );
