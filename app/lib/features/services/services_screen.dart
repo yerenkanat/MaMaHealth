@@ -1,8 +1,13 @@
 import 'package:flutter/material.dart';
 
+import 'blood/blood_type_screen.dart';
+import 'calendars/calendar_screens.dart';
 import 'checklist/checklist_screen.dart';
 import 'contractions/contraction_screen.dart';
 import 'kick/kick_counter_screen.dart';
+import 'names/baby_names_screen.dart';
+import 'tips/allowed_screen.dart';
+import 'ultrasound/ultrasound_screen.dart';
 import 'weight/weight_monitor_screen.dart';
 
 /// Хаб «Сервисы» (вкладка «Мониторинг») — сетка сервисов приложения.
@@ -54,6 +59,20 @@ Widget _screenFor(String title) {
     case 'Чеклисты':
     case 'Подготовка к роддому':
       return ChecklistScreen(title: title);
+    case 'Выбор имени для ребёнка':
+      return const BabyNamesScreen();
+    case 'Группа крови младенца':
+      return const BloodTypeScreen();
+    case 'Расшифровка УЗИ':
+      return const UltrasoundScreen();
+    case 'Что можно есть':
+      return const AllowedScreen(title: 'Что можно есть', kind: 'food');
+    case 'Что можно делать':
+      return const AllowedScreen(title: 'Что можно делать', kind: 'activity');
+    case 'Календарь беременности':
+      return const PregnancyCalendarScreen();
+    case 'Календарь развития ребёнка':
+      return const ChildGrowthScreen();
     default:
       return _ServiceStub(title: title);
   }
