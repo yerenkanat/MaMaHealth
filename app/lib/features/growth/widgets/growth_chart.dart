@@ -75,9 +75,9 @@ class GrowthChart extends StatelessWidget {
           ),
         ),
         lineBarsData: [
-          _ref(ref.p97, Colors.pink.shade100),
-          _ref(ref.p3, Colors.pink.shade100),
-          _ref(ref.p50, Colors.pink.shade300, dashed: true),
+          _ref(ref.p97, const Color(0xFFCFC9F2)),
+          _ref(ref.p3, const Color(0xFFCFC9F2)),
+          _ref(ref.p50, const Color(0xFF8B7BF0), dashed: true),
           LineChartBarData(
             spots: childSpots,
             isCurved: true,

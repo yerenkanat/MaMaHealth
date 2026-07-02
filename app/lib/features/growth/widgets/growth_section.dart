@@ -88,8 +88,8 @@ class _Legend extends StatelessWidget {
       child: Wrap(
         spacing: 14,
         children: [
-          _dot(Colors.pink.shade100, 'коридор P3–P97'),
-          _dot(Colors.pink.shade300, 'медиана ВОЗ'),
+          _dot(const Color(0xFFCFC9F2), 'коридор P3–P97'),
+          _dot(const Color(0xFF8B7BF0), 'медиана ВОЗ'),
           _dot(primary, 'ваш малыш'),
         ],
       ),

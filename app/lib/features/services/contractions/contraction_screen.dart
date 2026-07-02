@@ -2,6 +2,8 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+import '../../../core/theme/app_theme.dart';
+
 /// Счётчик схваток: тап старт/стоп, длительность и интервал, подсказка «пора в роддом».
 class ContractionScreen extends StatefulWidget {
   const ContractionScreen({super.key});
@@ -98,11 +100,21 @@ class _ContractionScreenState extends State<ContractionScreen> {
             onTap: _toggle,
             child: AnimatedContainer(
               duration: const Duration(milliseconds: 250),
-              width: 200,
-              height: 200,
+              width: 210,
+              height: 210,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: _running ? const Color(0xFFD53A5E) : const Color(0xFFF48FB1),
+                gradient: _running ? AppGradients.peach : AppGradients.lavender,
+                boxShadow: [
+                  BoxShadow(
+                    color: (_running
+                            ? const Color(0xFFFF8F6B)
+                            : const Color(0xFF8B7BF0))
+                        .withValues(alpha: 0.4),
+                    blurRadius: 30,
+                    spreadRadius: 2,
+                  ),
+                ],
               ),
               child: Center(
                 child: Column(
