@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import { pool } from '../db.js';
 import { verifyJwt } from '../middleware/verifyJwt.js';
+import { scheduleChildAlerts } from '../services/childScheduler.js';
 
 export const birthRouter = Router();
 
@@ -57,8 +58,11 @@ birthRouter.post('/:pregnancyId/birth', verifyJwt, async (req, res) => {
       [pregnancyId]
     );
 
+    // 5. Сразу генерируем расписание новорождённого (возраст 0 → БЦЖ + гепатит B).
+    //    Идемпотентно: повторный вызов не создаст дублей.
+    await scheduleChildAlerts(client, childId, new Date(birthDate), new Date());
+
     await client.query('COMMIT');
-    // Воркер сгенерирует расписание ребёнка при ближайшем прогоне (или триггерим сразу).
     return res.status(201).json({ childId, alreadyDone: false });
   } catch (err) {
     await client.query('ROLLBACK');
