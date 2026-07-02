@@ -27,6 +27,25 @@ docker compose up api worker           # API :8080, воркер по cron
 cd app && flutter pub get && flutter run
 ```
 
+## Аутентификация
+
+JWT выдаётся при регистрации/логине; клиент хранит его в `flutter_secure_storage`
+и шлёт как `Authorization: Bearer <token>`.
+
+```bash
+# Регистрация
+curl -X POST localhost:8080/auth/register -H 'Content-Type: application/json' \
+  -d '{"email":"mom@mama.kz","fullName":"Айгуль","districtId":1,"password":"secret123"}'
+
+# Логин
+curl -X POST localhost:8080/auth/login -H 'Content-Type: application/json' \
+  -d '{"email":"mom@mama.kz","password":"secret123"}'
+# -> { "token": "eyJ..." }
+```
+
+Пароли хешируются через `scrypt` (встроенный `node:crypto`), сравнение —
+в постоянное время (`timingSafeEqual`).
+
 ## Архитектура
 
 ```
