@@ -7,7 +7,7 @@ import '../../domain/models/profile.dart';
 import '../birth_trigger/bloc/birth_trigger_bloc.dart';
 import '../birth_trigger/widgets/birth_form_sheet.dart';
 import '../growth/widgets/growth_section.dart';
-import '../kick_counter/widgets/kick_heart_button.dart';
+import '../pregnancy/widgets/pregnancy_calendar.dart';
 import '../profile_switch/bloc/profile_switch_bloc.dart';
 import '../timeline/widgets/journey_timeline.dart';
 
@@ -115,14 +115,18 @@ class _ProfileView extends StatelessWidget {
               onStepChanged: (s) =>
                   context.read<ProfileSwitchBloc>().add(ProfileStepChanged(s)),
             ),
-            if (isPregnancy) ...[
-              const Spacer(),
-              KickHeartButton(count: kicks, onKick: onKick),
-              const Spacer(),
-              if (profile.currentStep >= 37)
-                _BirthButton(pregnancyId: profile.id),
-              const SizedBox(height: 8),
-            ] else
+            if (isPregnancy)
+              Expanded(
+                child: PregnancyCalendar(
+                  week: profile.currentStep + 1,
+                  kicks: kicks,
+                  onKick: onKick,
+                  footer: profile.currentStep >= 37
+                      ? _BirthButton(pregnancyId: profile.id)
+                      : null,
+                ),
+              )
+            else
               Expanded(
                 child: GrowthSection(gender: profile.gender ?? 'male'),
               ),
