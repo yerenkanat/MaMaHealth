@@ -6,6 +6,7 @@ import '../../core/theme/app_theme.dart';
 import '../../domain/models/profile.dart';
 import '../birth_trigger/bloc/birth_trigger_bloc.dart';
 import '../birth_trigger/widgets/birth_form_sheet.dart';
+import '../birth_trigger/widgets/confetti_overlay.dart';
 import '../child/widgets/child_calendar.dart';
 import '../pregnancy/widgets/pregnancy_calendar.dart';
 import '../profile_switch/bloc/profile_switch_bloc.dart';
@@ -28,6 +29,7 @@ class _HomeScreenState extends State<HomeScreen> {
       listener: (context, birth) {
         if (birth.status == BirthStatus.success && birth.childId != null) {
           HapticFeedback.mediumImpact();
+          ConfettiOverlay.show(context);
           context.read<ProfileSwitchBloc>().add(ChildAdded(birth.childId!));
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text('Поздравляем с рождением малыша! 🎉')),
