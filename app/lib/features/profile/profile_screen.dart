@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../core/theme/app_theme.dart';
 import '../../domain/models/profile.dart';
 import '../profile_switch/bloc/profile_switch_bloc.dart';
 
@@ -121,14 +122,17 @@ class _ChildrenCard extends StatelessWidget {
             .map((p) => p.title)
             .toList();
         return Container(
-          padding: const EdgeInsets.all(18),
+          padding: const EdgeInsets.all(20),
           decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(20),
-            gradient: const LinearGradient(
-              colors: [Color(0xFF5B6EF5), Color(0xFF3EC6C9)],
-              begin: Alignment.centerLeft,
-              end: Alignment.centerRight,
-            ),
+            borderRadius: BorderRadius.circular(26),
+            gradient: AppGradients.hero,
+            boxShadow: [
+              BoxShadow(
+                color: const Color(0xFF7C6BE8).withValues(alpha: 0.30),
+                blurRadius: 22,
+                offset: const Offset(0, 10),
+              ),
+            ],
           ),
           child: Row(
             children: [
@@ -172,7 +176,7 @@ class _PointsCard extends StatelessWidget {
           children: [
             Row(
               children: const [
-                Icon(Icons.stars, color: Color(0xFFE0457B)),
+                Icon(Icons.stars, color: AppColors.peach),
                 SizedBox(width: 10),
                 Text('1000 баллов',
                     style: TextStyle(fontSize: 20, fontWeight: FontWeight.w700)),

@@ -55,7 +55,7 @@ class _FetusPainter extends CustomPainter {
     // Амниотический пузырь: мягкое свечение.
     final sac = Paint()
       ..shader = const RadialGradient(
-        colors: [Color(0x33FF8FB1), Color(0x14FF8FB1), Color(0x00FF8FB1)],
+        colors: [Color(0x338B7BF0), Color(0x1439C6A8), Color(0x0039C6A8)],
       ).createShader(Rect.fromCircle(center: c, radius: r));
     canvas.drawCircle(c, r * 0.95 * breathe, sac);
     canvas.drawCircle(
@@ -64,7 +64,7 @@ class _FetusPainter extends CustomPainter {
       Paint()
         ..style = PaintingStyle.stroke
         ..strokeWidth = 2
-        ..color = const Color(0x2AF25C86),
+        ..color = const Color(0x2A8B7BF0),
     );
 
     // Плод: плавное покачивание + лёгкий наклон.

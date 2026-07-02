@@ -92,31 +92,33 @@ class _ServiceTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Material(
-      color: Colors.white,
-      borderRadius: BorderRadius.circular(20),
+      color: service.color,
+      borderRadius: BorderRadius.circular(24),
       elevation: 0,
       child: InkWell(
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(24),
         onTap: () => Navigator.of(context).push(
           MaterialPageRoute(builder: (_) => _screenFor(service.title)),
         ),
         child: Padding(
-          padding: const EdgeInsets.all(14),
+          padding: const EdgeInsets.all(16),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Container(
                 padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  color: service.color,
-                  borderRadius: BorderRadius.circular(16),
+                decoration: const BoxDecoration(
+                  color: Colors.white,
+                  shape: BoxShape.circle,
                 ),
                 child: Icon(service.icon, color: Colors.black87),
               ),
               const Spacer(),
               Text(service.title,
                   style: const TextStyle(
-                      fontSize: 15, fontWeight: FontWeight.w600)),
+                      fontSize: 15,
+                      fontWeight: FontWeight.w700,
+                      height: 1.2)),
             ],
           ),
         ),
