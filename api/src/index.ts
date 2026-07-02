@@ -1,3 +1,4 @@
+import './env.js';
 import express from 'express';
 import { authRouter } from './routes/auth.js';
 import { patientsRouter } from './routes/patients.js';

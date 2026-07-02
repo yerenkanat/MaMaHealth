@@ -15,7 +15,26 @@
 | `worker/`     | Node.js + TypeScript + BullMQ | Data-Driven медицинский планировщик пушей         |
 | `migrations/` | PostgreSQL 15 SQL             | Схема БД, partial-индексы, seed медпротоколов     |
 
-## Быстрый старт (dev)
+## Локальный бэкенд без Docker (Node + PostgreSQL)
+
+```bash
+# 0) требуется установленный Node.js и PostgreSQL; создать БД:
+#    createdb mama   (или CREATE DATABASE mama; в psql)
+# 1) настроить api/.env (DATABASE_URL под ваш пароль postgres)
+cd api
+npm install
+npm run migrate      # применить схему (0001..0003)
+npm run seed         # демо-мама mom@mama.kz / secret123 + беременность
+npm run dev          # API на http://localhost:8080
+
+# 2) клиент против API (10.0.2.2 = хост для Android-эмулятора):
+cd ../app
+flutter run --dart-define=USE_API=true
+```
+
+Без флага `USE_API` клиент работает в демо-режиме (in-memory, без бэкенда).
+
+## Быстрый старт (dev, Docker)
 
 ```bash
 cp .env.example .env

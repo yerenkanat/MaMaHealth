@@ -1,3 +1,4 @@
+import '../env.js';
 import { pool } from '../db.js';
 import { hashPassword } from '../services/auth.js';
 
