@@ -23,5 +23,6 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
-  assets:
-    - assets/lottie/
+  # Раскомментировать после добавления Lottie-ассетов (Birth-анимация):
+  # assets:
+  #   - assets/lottie/
