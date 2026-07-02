@@ -1,0 +1,20 @@
+# Node
+node_modules/
+dist/
+*.log
+.env
+
+# Flutter / Dart
+app/.dart_tool/
+app/.flutter-plugins
+app/.flutter-plugins-dependencies
+app/build/
+app/.packages
+app/pubspec.lock
+*.iml
+
+# IDE / OS
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
