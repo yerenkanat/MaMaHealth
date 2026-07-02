@@ -60,11 +60,11 @@ class _KickHeartButtonState extends State<KickHeartButton>
             decoration: BoxDecoration(
               shape: BoxShape.circle,
               gradient: const RadialGradient(
-                colors: [Color(0xFFFF8FB1), Color(0xFFF25C86)],
+                colors: [Color(0xFFFFB48F), Color(0xFFFF8F6B)],
               ),
               boxShadow: [
                 BoxShadow(
-                  color: const Color(0xFFF25C86).withValues(alpha: 0.45),
+                  color: const Color(0xFFFF8F6B).withValues(alpha: 0.45),
                   blurRadius: 40,
                   spreadRadius: 4,
                 ),

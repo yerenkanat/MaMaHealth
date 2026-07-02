@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 
+import '../../../core/theme/app_theme.dart';
 import '../../../data/pregnancy_weeks.dart';
 import '../../../domain/models/week_info.dart';
 import '../../kick_counter/widgets/kick_heart_button.dart';
 import 'virtual_fetus.dart';
 
-/// Понедельный календарь беременности: размер-фрукт, вес, виртуальный плод,
+/// Понедельный календарь беременности: hero-блок, виртуальный плод,
 /// блоки «О малыше / О Вас / Рекомендуем» и трекер шевелений.
 class PregnancyCalendar extends StatelessWidget {
   const PregnancyCalendar({
@@ -25,50 +26,40 @@ class PregnancyCalendar extends StatelessWidget {
   Widget build(BuildContext context) {
     final info = PregnancyWeeks.of(week);
     return SingleChildScrollView(
-      padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
+      padding: const EdgeInsets.fromLTRB(16, 8, 16, 28),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Row(
-            children: [
-              Expanded(child: _SizeCard(info)),
-              const SizedBox(width: 12),
-              Expanded(child: _WeightCard(info)),
-            ],
-          ),
-          const SizedBox(height: 16),
-          SizedBox(height: 220, child: VirtualFetus(week: week)),
-          const SizedBox(height: 12),
+          _HeroCard(week: week, info: info),
+          const SizedBox(height: 18),
+          SizedBox(height: 210, child: VirtualFetus(week: week)),
+          const SizedBox(height: 14),
           _InfoCard(
             title: 'О малыше',
             text: info.aboutBaby,
-            colors: const [Color(0xFFFAD0DD), Color(0xFFF8E1EA)],
+            gradient: AppGradients.lavender,
           ),
           const SizedBox(height: 12),
           _InfoCard(
             title: 'О Вас',
             text: info.aboutYou,
-            colors: const [Color(0xFFE7DAF7), Color(0xFFDCE7FB)],
+            gradient: AppGradients.mint,
           ),
           const SizedBox(height: 12),
           _InfoCard(
             title: 'Рекомендуем',
             text: info.tip,
-            colors: const [Color(0xFFFBF3C4), Color(0xFFD9F2D0)],
+            gradient: AppGradients.peach,
           ),
-          const SizedBox(height: 24),
-          const Align(
-            alignment: Alignment.centerLeft,
-            child: Text('Трекер шевелений',
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
-          ),
-          const SizedBox(height: 12),
+          const SizedBox(height: 26),
+          const Text('Трекер шевелений',
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.w800)),
+          const SizedBox(height: 14),
           Center(child: KickHeartButton(count: kicks, onKick: onKick)),
-          const SizedBox(height: 16),
+          const SizedBox(height: 18),
           const Text(
-            'Информация носит справочный характер и не заменяет консультацию '
-            'лечащего врача.',
-            style: TextStyle(fontSize: 12, color: Colors.black45),
+            'Информация носит справочный характер и не заменяет консультацию врача.',
+            style: TextStyle(fontSize: 12, color: Colors.black38),
           ),
           if (footer != null) ...[const SizedBox(height: 16), footer!],
         ],
@@ -77,55 +68,69 @@ class PregnancyCalendar extends StatelessWidget {
   }
 }
 
-class _SizeCard extends StatelessWidget {
-  const _SizeCard(this.info);
+class _HeroCard extends StatelessWidget {
+  const _HeroCard({required this.week, required this.info});
+  final int week;
   final WeekInfo info;
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(22),
       decoration: BoxDecoration(
-        color: const Color(0xFFFDEBF1),
-        borderRadius: BorderRadius.circular(20),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(info.emoji, style: const TextStyle(fontSize: 40)),
-          const SizedBox(height: 8),
-          Text(info.fruit,
-              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w700)),
-          const SizedBox(height: 2),
-          Text('рост ${info.lengthCm}',
-              style: const TextStyle(color: Colors.black54)),
+        borderRadius: BorderRadius.circular(30),
+        gradient: AppGradients.hero,
+        boxShadow: [
+          BoxShadow(
+            color: const Color(0xFF7C6BE8).withValues(alpha: 0.32),
+            blurRadius: 26,
+            offset: const Offset(0, 12),
+          ),
         ],
       ),
-    );
-  }
-}
-
-class _WeightCard extends StatelessWidget {
-  const _WeightCard(this.info);
-  final WeekInfo info;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: const Color(0xFFF2ECFB),
-        borderRadius: BorderRadius.circular(20),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          const Icon(Icons.monitor_weight_outlined, size: 40, color: Color(0xFF9B7BD1)),
-          const SizedBox(height: 8),
-          const Text('Вес',
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700)),
-          const SizedBox(height: 2),
-          Text(info.weight, style: const TextStyle(color: Colors.black54)),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text('НЕДЕЛЯ',
+                    style: TextStyle(
+                        color: Colors.white70,
+                        fontSize: 13,
+                        letterSpacing: 2,
+                        fontWeight: FontWeight.w600)),
+                Text('$week',
+                    style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 56,
+                        height: 1,
+                        fontWeight: FontWeight.w800)),
+                const SizedBox(height: 8),
+                Text('${info.fruit} · ${info.lengthCm}',
+                    style: const TextStyle(color: Colors.white, fontSize: 15)),
+              ],
+            ),
+          ),
+          const SizedBox(width: 12),
+          Column(
+            children: [
+              Text(info.emoji, style: const TextStyle(fontSize: 60)),
+              const SizedBox(height: 6),
+              Container(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
+                decoration: BoxDecoration(
+                  color: Colors.white.withValues(alpha: 0.22),
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                child: Text(info.weight,
+                    style: const TextStyle(
+                        color: Colors.white, fontWeight: FontWeight.w700)),
+              ),
+            ],
+          ),
         ],
       ),
     );
@@ -136,35 +141,34 @@ class _InfoCard extends StatelessWidget {
   const _InfoCard({
     required this.title,
     required this.text,
-    required this.colors,
+    required this.gradient,
   });
 
   final String title;
   final String text;
-  final List<Color> colors;
+  final Gradient gradient;
 
   @override
   Widget build(BuildContext context) {
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.all(18),
+      padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(20),
-        gradient: LinearGradient(
-          colors: colors,
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
+        borderRadius: BorderRadius.circular(26),
+        gradient: gradient,
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(title,
-              style:
-                  const TextStyle(fontSize: 17, fontWeight: FontWeight.w700)),
+              style: const TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w800,
+                  color: Colors.white)),
           const SizedBox(height: 8),
           Text(text,
-              style: const TextStyle(fontSize: 14, height: 1.35, color: Colors.black87)),
+              style: const TextStyle(
+                  fontSize: 14.5, height: 1.4, color: Colors.white)),
         ],
       ),
     );

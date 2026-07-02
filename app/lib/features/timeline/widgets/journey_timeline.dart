@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-/// Универсальный таймлайн: недели беременности ИЛИ месяцы ребёнка.
+import '../../../core/theme/app_theme.dart';
+
+/// Горизонтальный таймлайн: недели беременности ИЛИ месяцы ребёнка.
 class JourneyTimeline extends StatefulWidget {
   const JourneyTimeline({
     super.key,
@@ -29,13 +31,13 @@ class _JourneyTimelineState extends State<JourneyTimeline> {
     super.initState();
     _controller = PageController(
       initialPage: widget.currentStep,
-      viewportFraction: 0.32,
+      viewportFraction: 0.30,
     );
   }
 
   @override
   void dispose() {
-    _controller.dispose(); // Code Reviewer: обязательное закрытие контроллера.
+    _controller.dispose();
     super.dispose();
   }
 
@@ -48,7 +50,7 @@ class _JourneyTimelineState extends State<JourneyTimeline> {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      height: 130,
+      height: 132,
       child: PageView.builder(
         controller: _controller,
         physics: const BouncingScrollPhysics(),
@@ -57,42 +59,38 @@ class _JourneyTimelineState extends State<JourneyTimeline> {
         itemBuilder: (context, index) {
           final bool isActive = index == _selected;
           return AnimatedScale(
-            scale: isActive ? 1.0 : 0.82,
+            scale: isActive ? 1.0 : 0.80,
             duration: const Duration(milliseconds: 280),
             curve: Curves.easeOutCubic,
             child: AnimatedContainer(
               duration: const Duration(milliseconds: 280),
-              margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 12),
+              margin: const EdgeInsets.symmetric(horizontal: 7, vertical: 12),
               decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(24),
-                gradient: LinearGradient(
-                  colors: isActive
-                      ? [const Color(0xFFF7B6C8), const Color(0xFFF3D2E1)]
-                      : [const Color(0xFFF1F1F4), const Color(0xFFECECEF)],
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                ),
+                borderRadius: BorderRadius.circular(26),
+                gradient: isActive ? AppGradients.hero : null,
+                color: isActive ? null : Colors.white,
                 boxShadow: isActive
                     ? [
                         BoxShadow(
-                          color: const Color(0xFFF7B6C8).withValues(alpha: 0.4),
-                          blurRadius: 18,
-                          offset: const Offset(0, 8),
+                          color: const Color(0xFF8B7BF0).withValues(alpha: 0.35),
+                          blurRadius: 22,
+                          offset: const Offset(0, 10),
                         )
                       ]
-                    : const [],
+                    : null,
               ),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Text('${index + 1}',
                       style: TextStyle(
-                        fontSize: isActive ? 34 : 26,
-                        fontWeight: FontWeight.w700,
-                        color: isActive ? Colors.white : Colors.black38,
+                        fontSize: isActive ? 38 : 28,
+                        fontWeight: FontWeight.w800,
+                        color: isActive ? Colors.white : Colors.black26,
                       )),
                   Text(widget.unitLabel,
                       style: TextStyle(
+                        fontSize: 12,
                         color: isActive ? Colors.white70 : Colors.black26,
                       )),
                 ],
