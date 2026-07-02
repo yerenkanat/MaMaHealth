@@ -1,5 +1,10 @@
 import 'package:flutter/material.dart';
 
+import 'checklist/checklist_screen.dart';
+import 'contractions/contraction_screen.dart';
+import 'kick/kick_counter_screen.dart';
+import 'weight/weight_monitor_screen.dart';
+
 /// Хаб «Сервисы» (вкладка «Мониторинг») — сетка сервисов приложения.
 class ServicesScreen extends StatelessWidget {
   const ServicesScreen({super.key});
@@ -37,6 +42,23 @@ class ServicesScreen extends StatelessWidget {
   }
 }
 
+/// Маршрутизация плитки на реальный экран (или заглушку).
+Widget _screenFor(String title) {
+  switch (title) {
+    case 'Счётчик схваток':
+      return const ContractionScreen();
+    case 'Счётчик толчков':
+      return const KickCounterScreen();
+    case 'Монитор веса мамы':
+      return const WeightMonitorScreen();
+    case 'Чеклисты':
+    case 'Подготовка к роддому':
+      return ChecklistScreen(title: title);
+    default:
+      return _ServiceStub(title: title);
+  }
+}
+
 class _Service {
   const _Service(this.title, this.icon, this.color);
   final String title;
@@ -57,7 +79,7 @@ class _ServiceTile extends StatelessWidget {
       child: InkWell(
         borderRadius: BorderRadius.circular(20),
         onTap: () => Navigator.of(context).push(
-          MaterialPageRoute(builder: (_) => _ServiceStub(title: service.title)),
+          MaterialPageRoute(builder: (_) => _screenFor(service.title)),
         ),
         child: Padding(
           padding: const EdgeInsets.all(14),
