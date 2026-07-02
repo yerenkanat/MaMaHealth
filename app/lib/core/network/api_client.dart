@@ -1,22 +1,23 @@
 import 'dart:convert';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:http/http.dart' as http;
 
-/// Тонкая обёртка над http с JWT из secure storage (Keychain/Keystore).
+import 'token_store.dart';
+
+/// Тонкая обёртка над http с JWT из [TokenStore].
 class ApiClient {
   ApiClient({
     required this.baseUrl,
     http.Client? client,
-    FlutterSecureStorage? storage,
+    TokenStore? tokenStore,
   })  : _client = client ?? http.Client(),
-        _storage = storage ?? const FlutterSecureStorage();
+        _tokens = tokenStore ?? InMemoryTokenStore();
 
   final String baseUrl;
   final http.Client _client;
-  final FlutterSecureStorage _storage;
+  final TokenStore _tokens;
 
   Future<Map<String, String>> _headers() async {
-    final token = await _storage.read(key: 'jwt');
+    final token = await _tokens.read();
     return {
       'Content-Type': 'application/json',
       if (token != null) 'Authorization': 'Bearer $token',
