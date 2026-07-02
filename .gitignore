@@ -13,6 +13,9 @@ app/.packages
 app/pubspec.lock
 *.iml
 
+# Claude Code
+.claude/
+
 # IDE / OS
 .idea/
 .vscode/
