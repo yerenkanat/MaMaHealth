@@ -1,5 +1,7 @@
 # MaMa — Continuous Parenthood Journey
 
+[![CI](https://github.com/yerenkanat/MaMaHealth/actions/workflows/ci.yml/badge.svg)](https://github.com/yerenkanat/MaMaHealth/actions/workflows/ci.yml)
+
 Кроссплатформенное приложение экосистемы непрерывного родительства: трекинг беременности
 по неделям, календарь развития ребёнка, умные медицинские нотификации, телемедицина и
 экстренная геолокация.

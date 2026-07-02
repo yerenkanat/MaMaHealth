@@ -64,7 +64,7 @@ class _KickHeartButtonState extends State<KickHeartButton>
               ),
               boxShadow: [
                 BoxShadow(
-                  color: const Color(0xFFF25C86).withOpacity(0.45),
+                  color: const Color(0xFFF25C86).withValues(alpha: 0.45),
                   blurRadius: 40,
                   spreadRadius: 4,
                 ),
