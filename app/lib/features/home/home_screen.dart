@@ -6,7 +6,7 @@ import '../../core/theme/app_theme.dart';
 import '../../domain/models/profile.dart';
 import '../birth_trigger/bloc/birth_trigger_bloc.dart';
 import '../birth_trigger/widgets/birth_form_sheet.dart';
-import '../growth/widgets/growth_section.dart';
+import '../child/widgets/child_calendar.dart';
 import '../pregnancy/widgets/pregnancy_calendar.dart';
 import '../profile_switch/bloc/profile_switch_bloc.dart';
 import '../timeline/widgets/journey_timeline.dart';
@@ -128,7 +128,10 @@ class _ProfileView extends StatelessWidget {
               )
             else
               Expanded(
-                child: GrowthSection(gender: profile.gender ?? 'male'),
+                child: ChildCalendar(
+                  month: profile.currentStep,
+                  gender: profile.gender ?? 'male',
+                ),
               ),
           ],
         ),
