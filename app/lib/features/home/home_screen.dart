@@ -6,6 +6,7 @@ import '../../core/theme/app_theme.dart';
 import '../../domain/models/profile.dart';
 import '../birth_trigger/bloc/birth_trigger_bloc.dart';
 import '../birth_trigger/widgets/birth_form_sheet.dart';
+import '../growth/widgets/growth_section.dart';
 import '../kick_counter/widgets/kick_heart_button.dart';
 import '../profile_switch/bloc/profile_switch_bloc.dart';
 import '../timeline/widgets/journey_timeline.dart';
@@ -114,15 +115,17 @@ class _ProfileView extends StatelessWidget {
               onStepChanged: (s) =>
                   context.read<ProfileSwitchBloc>().add(ProfileStepChanged(s)),
             ),
-            const Spacer(),
-            if (isPregnancy)
-              KickHeartButton(count: kicks, onKick: onKick)
-            else
-              const Text('Календарь вакцинации и навыков',
-                  style: TextStyle(fontSize: 18)),
-            const Spacer(),
-            if (isPregnancy && profile.currentStep >= 37)
-              _BirthButton(pregnancyId: profile.id),
+            if (isPregnancy) ...[
+              const Spacer(),
+              KickHeartButton(count: kicks, onKick: onKick),
+              const Spacer(),
+              if (profile.currentStep >= 37)
+                _BirthButton(pregnancyId: profile.id),
+              const SizedBox(height: 8),
+            ] else
+              Expanded(
+                child: GrowthSection(gender: profile.gender ?? 'male'),
+              ),
           ],
         ),
       ),

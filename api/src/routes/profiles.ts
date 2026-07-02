@@ -49,8 +49,9 @@ profilesRouter.get('/', verifyJwt, async (req, res) => {
     id: string;
     name: string;
     birth_date: Date;
+    gender: string;
   }>(
-    `SELECT id, name, birth_date FROM children_profiles
+    `SELECT id, name, birth_date, gender FROM children_profiles
       WHERE user_id = $1 AND is_active = TRUE
       ORDER BY birth_date DESC`,
     [userId]
@@ -74,6 +75,7 @@ profilesRouter.get('/', verifyJwt, async (req, res) => {
       title: c.name,
       currentStep: ageInMonths(new Date(c.birth_date), now),
       totalSteps: CHILD_TOTAL_MONTHS,
+      gender: c.gender,
     })),
   ];
 

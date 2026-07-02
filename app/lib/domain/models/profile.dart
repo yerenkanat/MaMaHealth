@@ -10,6 +10,7 @@ class Profile extends Equatable {
     required this.title,
     required this.currentStep,
     required this.totalSteps,
+    this.gender,
   });
 
   final String id;
@@ -17,6 +18,7 @@ class Profile extends Equatable {
   final String title;     // «Беременность» | «Ерасыл»
   final int currentStep;  // индекс недели/месяца
   final int totalSteps;
+  final String? gender;   // 'male' | 'female' — только для детей
 
   bool get isPregnancy => type == ProfileType.pregnancy;
   String get unitLabel => isPregnancy ? 'неделя' : 'месяц';
@@ -27,6 +29,7 @@ class Profile extends Equatable {
         title: title,
         currentStep: currentStep ?? this.currentStep,
         totalSteps: totalSteps,
+        gender: gender,
       );
 
   factory Profile.fromJson(Map<String, dynamic> json) => Profile(
@@ -37,8 +40,9 @@ class Profile extends Equatable {
         title: json['title'] as String,
         currentStep: (json['currentStep'] as num).toInt(),
         totalSteps: (json['totalSteps'] as num).toInt(),
+        gender: json['gender'] as String?,
       );
 
   @override
-  List<Object?> get props => [id, type, title, currentStep, totalSteps];
+  List<Object?> get props => [id, type, title, currentStep, totalSteps, gender];
 }

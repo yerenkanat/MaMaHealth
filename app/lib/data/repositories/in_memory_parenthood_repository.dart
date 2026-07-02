@@ -12,6 +12,15 @@ class InMemoryParenthoodRepository implements ParenthoodRepository {
       currentStep: 37, // 38-я неделя — кнопка «Я родила!» уже доступна
       totalSteps: 42,
     ),
+    // Демо-ребёнок: включает переключатель профилей и режим роста.
+    const Profile(
+      id: 'ch_erasyl',
+      type: ProfileType.child,
+      title: 'Ерасыл',
+      currentStep: 2, // 2 месяца
+      totalSteps: 24,
+      gender: 'male',
+    ),
   ];
   int _seq = 0;
 
@@ -36,6 +45,7 @@ class InMemoryParenthoodRepository implements ParenthoodRepository {
         title: child.name,
         currentStep: 0,
         totalSteps: 24,
+        gender: child.gender,
       ));
     return id;
   }
