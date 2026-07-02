@@ -26,6 +26,29 @@
 
 ---
 
+## ✅ Full-stack и деливераблы ТЗ (реализовано + проверено)
+
+- [x] **Бэкенд end-to-end живой**: Node.js + PostgreSQL 16 (без Docker), `npm run migrate`
+      (идемпотентный, `schema_migrations`), `npm run seed`, API на :8080
+- [x] Клиент↔API: авто-логин (`AuthGateway`) + `--dart-define=USE_API=true` → реальные профили из БД
+- [x] **Birth Trigger через API** проверен в БД: ребёнок создан, беременность архивирована,
+      расписание прививок сгенерировано (БЦЖ+гепатит B)
+- [x] **Телемедицина**: WebRTC-сигналинг (`/ws/signal`, JWT + комнаты) + `POST /patients/me/geo`
+- [x] **Data Engineer**: медальонная аналитика Bronze→Silver→Gold (`0004_analytics.sql`,
+      витрины `gold_screening_completion`/`week12`/`daily_active_users`)
+- [x] **DevOps**: Prometheus `/metrics` + K8s-манифесты (infra/app/monitoring) + prometheus.yml
+- [x] **MaMa AI реальный Claude** (`claude-opus-4-8` через `@anthropic-ai/sdk`, env-gated,
+      локальный фолбэк без ключа) — `POST /assistant/chat`
+- [x] Редизайн UI: свежая пастель + сочные градиенты, крупные цифры (все вкладки)
+- [x] Календарь развития ребёнка (навыки/прививки/совет + график ВОЗ)
+- [x] 12 рабочих сервисов (счётчик схваток 5-1-1, монитор веса, чеклист, имена, группа крови, УЗИ, …)
+- [x] Видео-лента (карточки), конфетти при рождении
+
+**Осталось для продакшена:** реальный `ANTHROPIC_API_KEY` для Claude · вынос scheduler в `@mama/shared` ·
+перенос проекта из OneDrive · Data-gold в админку/дашборд · WebRTC-клиент во Flutter.
+
+---
+
 ## Приоритет 1 — Навигационный каркас и профиль (по референсам) ✅
 
 - [x] **Нижняя навигация** (5 вкладок): Главная · Мониторинг · MaMa AI · Видео · Профиль
