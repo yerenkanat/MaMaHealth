@@ -7,11 +7,14 @@ import { patientsRouter } from './routes/patients.js';
 import { birthRouter } from './routes/birth.js';
 import { profilesRouter } from './routes/profiles.js';
 import { attachSignaling } from './signaling.js';
+import { metricsHandler, metricsMiddleware } from './metrics.js';
 
 const app = express();
 app.use(express.json());
+app.use(metricsMiddleware);
 
 app.get('/health', (_req, res) => res.json({ status: 'ok' }));
+app.get('/metrics', metricsHandler);
 app.use('/auth', authRouter);
 app.use('/profiles', profilesRouter);
 app.use('/patients', geoRouter); // /patients/me/geo (до :patientId)
