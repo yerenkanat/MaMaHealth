@@ -12,7 +12,7 @@ class MamaAiScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (_) => AssistantCubit(LocalAssistantService()),
+      create: (context) => AssistantCubit(context.read<AssistantService>()),
       child: const _ChatView(),
     );
   }

@@ -1,6 +1,7 @@
 import './env.js';
 import { createServer } from 'node:http';
 import express from 'express';
+import { assistantRouter } from './routes/assistant.js';
 import { authRouter } from './routes/auth.js';
 import { geoRouter } from './routes/geo.js';
 import { patientsRouter } from './routes/patients.js';
@@ -16,6 +17,7 @@ app.use(metricsMiddleware);
 app.get('/health', (_req, res) => res.json({ status: 'ok' }));
 app.get('/metrics', metricsHandler);
 app.use('/auth', authRouter);
+app.use('/assistant', assistantRouter);
 app.use('/profiles', profilesRouter);
 app.use('/patients', geoRouter); // /patients/me/geo (до :patientId)
 app.use('/patients', patientsRouter);
