@@ -3,9 +3,9 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../core/theme/app_theme.dart';
-import '../../domain/models/new_child.dart';
 import '../../domain/models/profile.dart';
 import '../birth_trigger/bloc/birth_trigger_bloc.dart';
+import '../birth_trigger/widgets/birth_form_sheet.dart';
 import '../kick_counter/widgets/kick_heart_button.dart';
 import '../profile_switch/bloc/profile_switch_bloc.dart';
 import '../timeline/widgets/journey_timeline.dart';
@@ -151,15 +151,10 @@ class _BirthButton extends StatelessWidget {
     );
   }
 
-  void _submit(BuildContext context) {
-    // Упрощённая форма. В проде — bottom-sheet с полями и валидацией.
-    final child = NewChild(
-      name: 'Ерасыл',
-      gender: 'male',
-      birthDate: DateTime.now(),
-      birthWeightG: 3400,
-      birthHeightCm: 52,
-    );
-    context.read<BirthTriggerBloc>().add(BirthSubmitted(pregnancyId, child));
+  Future<void> _submit(BuildContext context) async {
+    final bloc = context.read<BirthTriggerBloc>();
+    final child = await BirthFormSheet.show(context);
+    if (child == null) return; // пользователь отменил
+    bloc.add(BirthSubmitted(pregnancyId, child));
   }
 }
