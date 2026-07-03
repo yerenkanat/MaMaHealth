@@ -148,6 +148,8 @@ abstract interface class EngagementService {
   Future<void> saveContraction(int durationSeconds, int? intervalSeconds);
   Future<List<DailyLog>> dailyLogs();
   Future<void> saveDaily(String date, String? mood, List<String> symptoms, String? note);
+  Future<List<String>> checklistState(String key);
+  Future<void> saveChecklistState(String key, List<String> items);
 }
 
 /// Боевая реализация — ходит в backend.
@@ -222,6 +224,20 @@ class ApiEngagementService implements EngagementService {
       'symptoms': symptoms,
       if (note != null && note.isNotEmpty) 'note': note,
     });
+  }
+
+  @override
+  Future<List<String>> checklistState(String key) async {
+    final data = await _api.get('/me/checklist/${Uri.encodeComponent(key)}')
+        as Map<String, dynamic>;
+    return ((data['items'] as List<dynamic>?) ?? const [])
+        .map((e) => e as String)
+        .toList();
+  }
+
+  @override
+  Future<void> saveChecklistState(String key, List<String> items) async {
+    await _api.post('/me/checklist/${Uri.encodeComponent(key)}', {'items': items});
   }
 }
 
@@ -333,5 +349,16 @@ class DemoEngagementService implements EngagementService {
       symptoms: symptoms,
       note: note,
     );
+  }
+
+  final Map<String, List<String>> _checklists = {};
+
+  @override
+  Future<List<String>> checklistState(String key) async =>
+      List.of(_checklists[key] ?? const []);
+
+  @override
+  Future<void> saveChecklistState(String key, List<String> items) async {
+    _checklists[key] = List.of(items);
   }
 }

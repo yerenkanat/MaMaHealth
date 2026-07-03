@@ -229,3 +229,29 @@ meRouter.post('/daily', verifyJwt, async (req, res) => {
   );
   return res.status(204).end();
 });
+
+// Состояние чеклиста по ключу списка: отмеченные пункты.
+meRouter.get('/checklist/:key', verifyJwt, async (req, res) => {
+  const userId = req.auth!.userId;
+  const { rows } = await pool.query<{ items: string[] }>(
+    `SELECT items FROM checklist_state WHERE user_id = $1 AND list_key = $2`,
+    [userId, req.params.key]
+  );
+  return res.json({ items: rows[0]?.items ?? [] });
+});
+
+meRouter.post('/checklist/:key', verifyJwt, async (req, res) => {
+  const userId = req.auth!.userId;
+  const { items } = req.body ?? {};
+  const list = Array.isArray(items)
+    ? items.filter((s): s is string => typeof s === 'string').slice(0, 200)
+    : [];
+  await pool.query(
+    `INSERT INTO checklist_state (user_id, list_key, items)
+     VALUES ($1, $2, $3)
+     ON CONFLICT (user_id, list_key) DO UPDATE
+       SET items = EXCLUDED.items, updated_at = now()`,
+    [userId, req.params.key, list]
+  );
+  return res.status(204).end();
+});

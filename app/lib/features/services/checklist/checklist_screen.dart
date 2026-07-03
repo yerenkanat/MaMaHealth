@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+
+import '../../engagement/engagement_service.dart';
 
 /// Чеклист (в роддом / подготовка) с прогрессом и отметками.
 class ChecklistScreen extends StatefulWidget {
@@ -34,6 +37,37 @@ class _ChecklistScreenState extends State<ChecklistScreen> {
   };
 
   final Set<String> _checked = {};
+
+  @override
+  void initState() {
+    super.initState();
+    _load();
+  }
+
+  Future<void> _load() async {
+    try {
+      final items =
+          await context.read<EngagementService>().checklistState(widget.title);
+      if (!mounted) return;
+      setState(() {
+        _checked
+          ..clear()
+          ..addAll(items);
+      });
+    } catch (_) {
+      // офлайн — начинаем без отметок
+    }
+  }
+
+  Future<void> _persist() async {
+    try {
+      await context
+          .read<EngagementService>()
+          .saveChecklistState(widget.title, _checked.toList());
+    } catch (_) {
+      // молча — локальное состояние уже обновлено
+    }
+  }
 
   int get _total => _sections.values.fold(0, (s, l) => s + l.length);
   int get _done => _checked.length;
@@ -76,13 +110,16 @@ class _ChecklistScreenState extends State<ChecklistScreen> {
                       value: _checked.contains(item),
                       title: Text(item),
                       controlAffinity: ListTileControlAffinity.leading,
-                      onChanged: (v) => setState(() {
-                        if (v == true) {
-                          _checked.add(item);
-                        } else {
-                          _checked.remove(item);
-                        }
-                      }),
+                      onChanged: (v) {
+                        setState(() {
+                          if (v == true) {
+                            _checked.add(item);
+                          } else {
+                            _checked.remove(item);
+                          }
+                        });
+                        _persist();
+                      },
                     ),
                 ],
               ],
