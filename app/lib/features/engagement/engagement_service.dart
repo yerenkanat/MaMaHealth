@@ -157,6 +157,18 @@ abstract interface class EngagementService {
   Future<void> setDueDate(String date);
   Future<List<CyclePeriod>> cycles();
   Future<void> saveCycle(DateTime start, DateTime? end);
+  Future<List<Insight>> insights();
+}
+
+class Insight {
+  const Insight({required this.text, required this.emoji});
+  final String text;
+  final String emoji;
+
+  factory Insight.fromJson(Map<String, dynamic> j) => Insight(
+        text: j['text'] as String,
+        emoji: j['emoji'] as String? ?? '💡',
+      );
 }
 
 class CyclePeriod {
@@ -332,6 +344,12 @@ class ApiEngagementService implements EngagementService {
       'startDate': iso(start),
       if (end != null) 'endDate': iso(end),
     });
+  }
+
+  @override
+  Future<List<Insight>> insights() async {
+    final data = await _api.get('/me/insights') as List<dynamic>;
+    return data.map((e) => Insight.fromJson(e as Map<String, dynamic>)).toList();
   }
 }
 
@@ -510,4 +528,10 @@ class DemoEngagementService implements EngagementService {
           c.start.day == start.day)
       ..insert(0, CyclePeriod(start: start, end: end));
   }
+
+  @override
+  Future<List<Insight>> insights() async => const [
+        Insight(text: 'До месячных ~2 дн. — подготовьтесь заранее.', emoji: '🩸'),
+        Insight(text: 'Отличная серия — так держать 💪', emoji: '🔥'),
+      ];
 }

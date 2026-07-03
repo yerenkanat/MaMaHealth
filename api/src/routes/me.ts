@@ -341,6 +341,84 @@ meRouter.post('/pregnancy', verifyJwt, async (req, res) => {
   return res.status(204).end();
 });
 
+// Проактивные подсказки ассистента, вычисленные из данных пользователя.
+meRouter.get('/insights', verifyJwt, async (req, res) => {
+  const userId = req.auth!.userId;
+  const insights: { text: string; emoji: string }[] = [];
+  const DAY = 86_400_000;
+  const now = Date.now();
+
+  // 1) Прогноз цикла
+  const cyc = await pool.query<{ start_date: string }>(
+    `SELECT to_char(start_date, 'YYYY-MM-DD') AS start_date
+       FROM menstrual_cycles WHERE user_id = $1 ORDER BY start_date ASC`,
+    [userId]
+  );
+  const starts = cyc.rows.map((r) => new Date(r.start_date + 'T00:00:00Z'));
+  if (starts.length > 0) {
+    const gaps: number[] = [];
+    for (let i = 1; i < starts.length; i++) {
+      gaps.push(Math.round((starts[i].getTime() - starts[i - 1].getTime()) / DAY));
+    }
+    let avg = gaps.length ? Math.round(gaps.reduce((a, b) => a + b, 0) / gaps.length) : 28;
+    avg = Math.min(35, Math.max(21, avg));
+    const next = new Date(starts[starts.length - 1].getTime() + avg * DAY);
+    const days = Math.round((next.getTime() - now) / DAY);
+    if (days >= 0 && days <= 3) {
+      insights.push({
+        text: days === 0 ? 'Месячные ожидаются сегодня.' : `До месячных ~${days} дн. — подготовьтесь заранее.`,
+        emoji: '🩸',
+      });
+    } else if (days < 0 && days >= -7) {
+      insights.push({ text: `Задержка ${-days} дн. Если беспокоит — сделайте тест или загляните к врачу.`, emoji: '📅' });
+    }
+    const ovulation = new Date(next.getTime() - 14 * DAY);
+    const fertileStart = ovulation.getTime() - 4 * DAY;
+    const fertileEnd = ovulation.getTime() + DAY;
+    if (now >= fertileStart && now <= fertileEnd) {
+      insights.push({ text: 'Сейчас фертильные дни — благоприятное время для зачатия.', emoji: '🌱' });
+    }
+  }
+
+  // 2) Частый симптом за последние записи
+  const logs = await pool.query<{ symptoms: string[] }>(
+    `SELECT symptoms FROM daily_logs WHERE user_id = $1 ORDER BY log_date DESC LIMIT 7`,
+    [userId]
+  );
+  const symCount = new Map<string, number>();
+  for (const row of logs.rows) {
+    for (const s of row.symptoms) symCount.set(s, (symCount.get(s) ?? 0) + 1);
+  }
+  const RU: Record<string, string> = {
+    nausea: 'тошноту', fatigue: 'усталость', headache: 'головную боль',
+    backache: 'боль в спине', cravings: 'тягу к еде', swelling: 'отёки',
+    heartburn: 'изжогу', insomnia: 'бессонницу', cramps: 'спазмы', dizziness: 'головокружение',
+  };
+  let topSym: string | null = null;
+  let topN = 0;
+  for (const [s, n] of symCount) {
+    if (n >= 3 && n > topN) { topSym = s; topN = n; }
+  }
+  if (topSym) {
+    insights.push({
+      text: `Вы часто отмечаете ${RU[topSym] ?? topSym} (${topN} дн.). Спросите меня, как облегчить это.`,
+      emoji: '💡',
+    });
+  }
+
+  // 3) Стрик
+  const u = await pool.query<{ streak: number }>(
+    `SELECT streak FROM users WHERE id = $1`,
+    [userId]
+  );
+  const streak = u.rows[0]?.streak ?? 0;
+  if (streak >= 3) {
+    insights.push({ text: `Отличная серия — ${streak} дн. подряд! Так держать 💪`, emoji: '🔥' });
+  }
+
+  return res.json(insights.slice(0, 3));
+});
+
 const BABY_TYPES = new Set(['feed', 'sleep', 'diaper']);
 
 // Дневник малыша: последние события (кормления/сон/подгузники).

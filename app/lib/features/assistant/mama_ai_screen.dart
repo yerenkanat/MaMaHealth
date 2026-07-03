@@ -31,6 +31,22 @@ class _ChatView extends StatefulWidget {
 
 class _ChatViewState extends State<_ChatView> {
   final _input = TextEditingController();
+  List<Insight> _insights = const [];
+
+  @override
+  void initState() {
+    super.initState();
+    _loadInsights();
+  }
+
+  Future<void> _loadInsights() async {
+    try {
+      final list = await context.read<EngagementService>().insights();
+      if (mounted) setState(() => _insights = list);
+    } catch (_) {
+      // офлайн — просто без проактивных подсказок
+    }
+  }
 
   @override
   void dispose() {
@@ -43,6 +59,10 @@ class _ChatViewState extends State<_ChatView> {
     if (text.trim().isEmpty) return;
     context.read<AssistantCubit>().send(text);
     _input.clear();
+  }
+
+  void _sendText(BuildContext context, String text) {
+    context.read<AssistantCubit>().send(text);
   }
 
   @override
@@ -61,6 +81,11 @@ class _ChatViewState extends State<_ChatView> {
       ),
       body: Column(
         children: [
+          if (_insights.isNotEmpty)
+            _InsightBar(
+              insights: _insights,
+              onTap: (t) => _sendText(context, t),
+            ),
           Expanded(
             child: BlocBuilder<AssistantCubit, AssistantState>(
               builder: (context, state) {
@@ -110,6 +135,54 @@ class _ChatViewState extends State<_ChatView> {
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+class _InsightBar extends StatelessWidget {
+  const _InsightBar({required this.insights, required this.onTap});
+  final List<Insight> insights;
+  final ValueChanged<String> onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: 92,
+      padding: const EdgeInsets.symmetric(vertical: 8),
+      child: ListView.separated(
+        scrollDirection: Axis.horizontal,
+        padding: const EdgeInsets.symmetric(horizontal: 12),
+        itemCount: insights.length,
+        separatorBuilder: (_, __) => const SizedBox(width: 10),
+        itemBuilder: (_, i) {
+          final ins = insights[i];
+          return GestureDetector(
+            onTap: () => onTap(ins.text),
+            child: Container(
+              width: 240,
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                gradient: const LinearGradient(
+                  colors: [Color(0xFFEDE7FB), Color(0xFFDDF5EC)],
+                ),
+                borderRadius: BorderRadius.circular(16),
+              ),
+              child: Row(
+                children: [
+                  Text(ins.emoji, style: const TextStyle(fontSize: 22)),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: Text(ins.text,
+                        maxLines: 3,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(fontSize: 12.5, height: 1.25)),
+                  ),
+                ],
+              ),
+            ),
+          );
+        },
       ),
     );
   }
