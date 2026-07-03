@@ -6,6 +6,7 @@ import '../../core/theme/app_theme.dart';
 import '../../domain/models/profile.dart';
 import '../engagement/engagement_service.dart';
 import '../profile_switch/bloc/profile_switch_bloc.dart';
+import '../services/trends/trends_screen.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -69,6 +70,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
             const _ChildrenCard(),
             const SizedBox(height: 12),
             _PointsCard(points: me?.points ?? 0, onInvite: _invite),
+            const SizedBox(height: 12),
+            _TrendsCard(streak: me?.streak ?? 0),
             const SizedBox(height: 20),
             _FavoritesSection(onTap: (t) => _toast('$t — скоро')),
           ],
@@ -230,6 +233,59 @@ class _PointsCard extends StatelessWidget {
               ],
             ),
           ],
+        ),
+      ),
+    );
+  }
+}
+
+class _TrendsCard extends StatelessWidget {
+  const _TrendsCard({required this.streak});
+  final int streak;
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        borderRadius: BorderRadius.circular(20),
+        onTap: () => Navigator.of(context).push(
+          MaterialPageRoute(builder: (_) => const TrendsScreen()),
+        ),
+        child: Container(
+          padding: const EdgeInsets.all(18),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(20),
+            gradient: AppGradients.mint,
+          ),
+          child: Row(
+            children: [
+              const CircleAvatar(
+                backgroundColor: Colors.white,
+                child: Icon(Icons.insights, color: Color(0xFF2E9E6E)),
+              ),
+              const SizedBox(width: 14),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text('Мои тренды',
+                        style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 18,
+                            fontWeight: FontWeight.w700)),
+                    const SizedBox(height: 2),
+                    Text(
+                        streak > 0
+                            ? 'Серия $streak дн. · настроение, симптомы, вес'
+                            : 'Настроение, симптомы, вес и активность',
+                        style: const TextStyle(color: Colors.white70, fontSize: 13)),
+                  ],
+                ),
+              ),
+              const Icon(Icons.chevron_right, color: Colors.white),
+            ],
+          ),
         ),
       ),
     );
