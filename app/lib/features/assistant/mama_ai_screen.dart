@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../engagement/engagement_service.dart';
 import 'assistant_service.dart';
 import 'chat_message.dart';
 import 'cubit/assistant_cubit.dart';
@@ -12,7 +13,10 @@ class MamaAiScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (context) => AssistantCubit(context.read<AssistantService>()),
+      create: (context) => AssistantCubit(
+        context.read<AssistantService>(),
+        engagement: context.read<EngagementService>(),
+      ),
       child: const _ChatView(),
     );
   }

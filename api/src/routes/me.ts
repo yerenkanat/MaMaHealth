@@ -255,3 +255,29 @@ meRouter.post('/checklist/:key', verifyJwt, async (req, res) => {
   );
   return res.status(204).end();
 });
+
+// История чата с MaMa AI (последние 50, в хронологическом порядке).
+meRouter.get('/chat', verifyJwt, async (req, res) => {
+  const userId = req.auth!.userId;
+  const { rows } = await pool.query<{ role: string; text: string }>(
+    `SELECT role, text FROM (
+       SELECT role, text, created_at FROM chat_messages
+        WHERE user_id = $1 ORDER BY created_at DESC LIMIT 50
+     ) t ORDER BY created_at ASC`,
+    [userId]
+  );
+  return res.json(rows.map((r) => ({ role: r.role, text: r.text })));
+});
+
+meRouter.post('/chat', verifyJwt, async (req, res) => {
+  const userId = req.auth!.userId;
+  const { role, text } = req.body ?? {};
+  if ((role !== 'user' && role !== 'assistant') || typeof text !== 'string' || !text.trim()) {
+    return res.status(400).json({ error: 'bad_input' });
+  }
+  await pool.query(
+    `INSERT INTO chat_messages (user_id, role, text) VALUES ($1, $2, $3)`,
+    [userId, role, text.slice(0, 4000)]
+  );
+  return res.status(204).end();
+});

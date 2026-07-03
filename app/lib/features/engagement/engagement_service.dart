@@ -150,6 +150,17 @@ abstract interface class EngagementService {
   Future<void> saveDaily(String date, String? mood, List<String> symptoms, String? note);
   Future<List<String>> checklistState(String key);
   Future<void> saveChecklistState(String key, List<String> items);
+  Future<List<ChatTurn>> chatHistory();
+  Future<void> saveChatMessage(String role, String text);
+}
+
+class ChatTurn {
+  const ChatTurn({required this.role, required this.text});
+  final String role; // user | assistant
+  final String text;
+
+  factory ChatTurn.fromJson(Map<String, dynamic> j) =>
+      ChatTurn(role: j['role'] as String, text: j['text'] as String);
 }
 
 /// Боевая реализация — ходит в backend.
@@ -238,6 +249,17 @@ class ApiEngagementService implements EngagementService {
   @override
   Future<void> saveChecklistState(String key, List<String> items) async {
     await _api.post('/me/checklist/${Uri.encodeComponent(key)}', {'items': items});
+  }
+
+  @override
+  Future<List<ChatTurn>> chatHistory() async {
+    final data = await _api.get('/me/chat') as List<dynamic>;
+    return data.map((e) => ChatTurn.fromJson(e as Map<String, dynamic>)).toList();
+  }
+
+  @override
+  Future<void> saveChatMessage(String role, String text) async {
+    await _api.post('/me/chat', {'role': role, 'text': text});
   }
 }
 
@@ -360,5 +382,15 @@ class DemoEngagementService implements EngagementService {
   @override
   Future<void> saveChecklistState(String key, List<String> items) async {
     _checklists[key] = List.of(items);
+  }
+
+  final List<ChatTurn> _chat = [];
+
+  @override
+  Future<List<ChatTurn>> chatHistory() async => List.of(_chat);
+
+  @override
+  Future<void> saveChatMessage(String role, String text) async {
+    _chat.add(ChatTurn(role: role, text: text));
   }
 }
