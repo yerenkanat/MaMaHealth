@@ -12,9 +12,10 @@ async function main() {
     await client.query('BEGIN');
 
     const { rows } = await client.query<{ id: string }>(
-      `INSERT INTO users (email, full_name, district_id, role, password_hash)
-       VALUES ('mom@mama.kz', 'Айгуль', 1, 'parent', $1)
-       ON CONFLICT (email) DO UPDATE SET full_name = EXCLUDED.full_name
+      `INSERT INTO users (email, full_name, district_id, role, password_hash, city, points)
+       VALUES ('mom@mama.kz', 'Айгуль', 1, 'parent', $1, 'Алматы, Қазақстан', 1000)
+       ON CONFLICT (email) DO UPDATE
+         SET full_name = EXCLUDED.full_name, city = EXCLUDED.city
        RETURNING id`,
       [hashPassword('secret123')]
     );
