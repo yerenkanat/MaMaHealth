@@ -67,9 +67,9 @@ class _HeaderCard extends StatelessWidget {
             const Text('Айман',
                 style: TextStyle(fontSize: 24, fontWeight: FontWeight.w700)),
             const SizedBox(height: 8),
-            Row(
+            const Row(
               mainAxisAlignment: MainAxisAlignment.center,
-              children: const [
+              children: [
                 _Stat(value: '413', label: 'подписчиков'),
                 SizedBox(width: 24),
                 _Stat(value: '39 911', label: 'подписки'),
@@ -174,8 +174,8 @@ class _PointsCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Row(
-              children: const [
+            const Row(
+              children: [
                 Icon(Icons.stars, color: AppColors.peach),
                 SizedBox(width: 10),
                 Text('1000 баллов',
@@ -217,8 +217,8 @@ class _FavoritesSection extends StatelessWidget {
       elevation: 0,
       color: Colors.white,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-      child: Column(
-        children: const [
+      child: const Column(
+        children: [
           ListTile(leading: Icon(Icons.edit_outlined), title: Text('Мои посты'), trailing: Icon(Icons.chevron_right)),
           Divider(height: 1),
           ListTile(leading: Icon(Icons.shopping_bag_outlined), title: Text('Мои заказы'), trailing: Icon(Icons.chevron_right)),

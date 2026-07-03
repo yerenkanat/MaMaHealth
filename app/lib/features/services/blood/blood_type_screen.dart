@@ -98,10 +98,10 @@ class _BloodTypeScreenState extends State<BloodTypeScreen> {
           ),
           if (_rhConflictRisk) ...[
             const SizedBox(height: 12),
-            Card(
+            const Card(
               elevation: 0,
-              color: const Color(0xFFFDE0E6),
-              child: const Padding(
+              color: Color(0xFFFDE0E6),
+              child: Padding(
                 padding: EdgeInsets.all(16),
                 child: Row(children: [
                   Icon(Icons.warning_amber, color: Color(0xFFD53A5E)),

@@ -62,11 +62,11 @@ assistantRouter.post('/chat', async (req, res) => {
       system: SYSTEM,
       messages,
     });
-    const text = response.content
-      .filter((b): b is { type: 'text'; text: string } => b.type === 'text')
-      .map((b) => b.text)
-      .join('\n');
-    return res.json({ reply: text, source: 'claude' });
+    const parts: string[] = [];
+    for (const block of response.content) {
+      if (block.type === 'text') parts.push(block.text);
+    }
+    return res.json({ reply: parts.join('\n'), source: 'claude' });
   } catch (err) {
     console.error('[assistant] Claude error', err);
     return res.json({ reply: localReply(lastUser), source: 'local-error' });
