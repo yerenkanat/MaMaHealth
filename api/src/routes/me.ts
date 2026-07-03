@@ -282,6 +282,43 @@ meRouter.post('/chat', verifyJwt, async (req, res) => {
   return res.status(204).end();
 });
 
+// Трекинг цикла: список залогированных месячных (новые сверху).
+meRouter.get('/cycles', verifyJwt, async (req, res) => {
+  const userId = req.auth!.userId;
+  const { rows } = await pool.query<{ start_date: string; end_date: string | null }>(
+    `SELECT to_char(start_date, 'YYYY-MM-DD') AS start_date,
+            to_char(end_date, 'YYYY-MM-DD') AS end_date
+       FROM menstrual_cycles WHERE user_id = $1
+      ORDER BY start_date DESC LIMIT 24`,
+    [userId]
+  );
+  return res.json(
+    rows.map((r) => ({ startDate: r.start_date, endDate: r.end_date }))
+  );
+});
+
+// Отметить месячные (start + опционально end). Upsert по дате начала.
+meRouter.post('/cycles', verifyJwt, async (req, res) => {
+  const userId = req.auth!.userId;
+  const { startDate, endDate } = req.body ?? {};
+  const dateRe = /^\d{4}-\d{2}-\d{2}$/;
+  if (typeof startDate !== 'string' || !dateRe.test(startDate)) {
+    return res.status(400).json({ error: 'bad_start' });
+  }
+  const end =
+    typeof endDate === 'string' && dateRe.test(endDate) ? endDate : null;
+  if (end !== null && end < startDate) {
+    return res.status(400).json({ error: 'end_before_start' });
+  }
+  await pool.query(
+    `INSERT INTO menstrual_cycles (user_id, start_date, end_date)
+     VALUES ($1, $2, $3)
+     ON CONFLICT (user_id, start_date) DO UPDATE SET end_date = EXCLUDED.end_date`,
+    [userId, startDate, end]
+  );
+  return res.status(204).end();
+});
+
 // Онбординг: задать/обновить ПДР активной беременности (пересчёт недели — в /profiles).
 meRouter.post('/pregnancy', verifyJwt, async (req, res) => {
   const userId = req.auth!.userId;

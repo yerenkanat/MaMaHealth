@@ -5,6 +5,7 @@ import 'blood/blood_type_screen.dart';
 import 'calendars/calendar_screens.dart';
 import 'checklist/checklist_screen.dart';
 import 'contractions/contraction_screen.dart';
+import 'cycle/cycle_screen.dart';
 import 'daily/daily_log_screen.dart';
 import 'report/doctor_report_screen.dart';
 import 'trends/trends_screen.dart';
@@ -20,6 +21,7 @@ class ServicesScreen extends StatelessWidget {
   const ServicesScreen({super.key});
 
   static const _services = <_Service>[
+    _Service('Мой цикл', Icons.calendar_today, Color(0xFFFFE0E6)),
     _Service('Мои тренды', Icons.insights, Color(0xFFE7E0FB)),
     _Service('Дневник малыша', Icons.baby_changing_station, Color(0xFFDCEFFB)),
     _Service('Календарь прививок', Icons.vaccines, Color(0xFFDDF5EC)),
@@ -60,6 +62,8 @@ class ServicesScreen extends StatelessWidget {
 /// Маршрутизация плитки на реальный экран (или заглушку).
 Widget _screenFor(String title) {
   switch (title) {
+    case 'Мой цикл':
+      return const CycleScreen();
     case 'Мои тренды':
       return const TrendsScreen();
     case 'Дневник малыша':

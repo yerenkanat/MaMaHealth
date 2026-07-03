@@ -155,6 +155,21 @@ abstract interface class EngagementService {
   Future<List<BabyEvent>> babyEvents();
   Future<void> saveBabyEvent(String type, String? detail);
   Future<void> setDueDate(String date);
+  Future<List<CyclePeriod>> cycles();
+  Future<void> saveCycle(DateTime start, DateTime? end);
+}
+
+class CyclePeriod {
+  const CyclePeriod({required this.start, this.end});
+  final DateTime start;
+  final DateTime? end;
+
+  static DateTime _d(String s) => DateTime.parse(s);
+
+  factory CyclePeriod.fromJson(Map<String, dynamic> j) => CyclePeriod(
+        start: _d(j['startDate'] as String),
+        end: j['endDate'] == null ? null : _d(j['endDate'] as String),
+      );
 }
 
 class BabyEvent {
@@ -301,6 +316,22 @@ class ApiEngagementService implements EngagementService {
   @override
   Future<void> setDueDate(String date) async {
     await _api.post('/me/pregnancy', {'dueDate': date});
+  }
+
+  @override
+  Future<List<CyclePeriod>> cycles() async {
+    final data = await _api.get('/me/cycles') as List<dynamic>;
+    return data.map((e) => CyclePeriod.fromJson(e as Map<String, dynamic>)).toList();
+  }
+
+  @override
+  Future<void> saveCycle(DateTime start, DateTime? end) async {
+    String iso(DateTime d) =>
+        '${d.year}-${d.month.toString().padLeft(2, '0')}-${d.day.toString().padLeft(2, '0')}';
+    await _api.post('/me/cycles', {
+      'startDate': iso(start),
+      if (end != null) 'endDate': iso(end),
+    });
   }
 }
 
@@ -451,5 +482,32 @@ class DemoEngagementService implements EngagementService {
   @override
   Future<void> setDueDate(String date) async {
     // демо: срок не влияет на статичный InMemory-профиль
+  }
+
+  final List<CyclePeriod> _cycles = [
+    CyclePeriod(
+      start: DateTime.now().subtract(const Duration(days: 26)),
+      end: DateTime.now().subtract(const Duration(days: 21)),
+    ),
+    CyclePeriod(
+      start: DateTime.now().subtract(const Duration(days: 54)),
+      end: DateTime.now().subtract(const Duration(days: 49)),
+    ),
+  ];
+
+  @override
+  Future<List<CyclePeriod>> cycles() async {
+    final list = List.of(_cycles)..sort((a, b) => b.start.compareTo(a.start));
+    return list;
+  }
+
+  @override
+  Future<void> saveCycle(DateTime start, DateTime? end) async {
+    _cycles
+      ..removeWhere((c) =>
+          c.start.year == start.year &&
+          c.start.month == start.month &&
+          c.start.day == start.day)
+      ..insert(0, CyclePeriod(start: start, end: end));
   }
 }
