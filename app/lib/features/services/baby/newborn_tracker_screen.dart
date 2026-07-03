@@ -25,7 +25,9 @@ class _NewbornTrackerScreenState extends State<NewbornTrackerScreen> {
 
   void _reload() {
     final future = context.read<EngagementService>().babyEvents();
-    setState(() => _future = future);
+    setState(() {
+      _future = future;
+    });
   }
 
   Future<void> _log(String type, String? detail) async {

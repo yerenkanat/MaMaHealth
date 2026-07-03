@@ -59,7 +59,9 @@ class _DailyLogScreenState extends State<DailyLogScreen> {
 
   Future<void> _load() async {
     final future = context.read<EngagementService>().dailyLogs();
-    setState(() => _history = future);
+    setState(() {
+      _history = future;
+    });
     try {
       final logs = await future;
       final today = logs.where((l) => l.date == _today).firstOrNull;
