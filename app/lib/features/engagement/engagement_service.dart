@@ -75,12 +75,33 @@ class WeightPoint {
       );
 }
 
+class KickSession {
+  const KickSession({
+    required this.count,
+    required this.durationSeconds,
+    required this.createdAt,
+  });
+
+  final int count;
+  final int durationSeconds;
+  final DateTime createdAt;
+
+  factory KickSession.fromJson(Map<String, dynamic> j) => KickSession(
+        count: (j['count'] as num).toInt(),
+        durationSeconds: (j['durationSeconds'] as num).toInt(),
+        createdAt:
+            DateTime.tryParse(j['createdAt'] as String? ?? '') ?? DateTime.now(),
+      );
+}
+
 abstract interface class EngagementService {
   Future<MeProfile> me();
   Future<CheckinResult> checkin();
   Future<List<Reminder>> reminders();
   Future<List<WeightPoint>> weight();
   Future<void> saveWeight(int week, double gainKg);
+  Future<List<KickSession>> kicks();
+  Future<void> saveKick(int count, int durationSeconds);
 }
 
 /// Боевая реализация — ходит в backend.
@@ -111,6 +132,17 @@ class ApiEngagementService implements EngagementService {
   @override
   Future<void> saveWeight(int week, double gainKg) async {
     await _api.post('/me/weight', {'week': week, 'gainKg': gainKg});
+  }
+
+  @override
+  Future<List<KickSession>> kicks() async {
+    final data = await _api.get('/me/kicks') as List<dynamic>;
+    return data.map((e) => KickSession.fromJson(e as Map<String, dynamic>)).toList();
+  }
+
+  @override
+  Future<void> saveKick(int count, int durationSeconds) async {
+    await _api.post('/me/kicks', {'count': count, 'durationSeconds': durationSeconds});
   }
 }
 
@@ -168,5 +200,22 @@ class DemoEngagementService implements EngagementService {
       ..removeWhere((e) => e.week == week)
       ..add(WeightPoint(week: week, gainKg: gainKg))
       ..sort((a, b) => a.week.compareTo(b.week));
+  }
+
+  final List<KickSession> _kicks = [];
+
+  @override
+  Future<List<KickSession>> kicks() async => List.of(_kicks);
+
+  @override
+  Future<void> saveKick(int count, int durationSeconds) async {
+    _kicks.insert(
+      0,
+      KickSession(
+        count: count,
+        durationSeconds: durationSeconds,
+        createdAt: DateTime.now(),
+      ),
+    );
   }
 }

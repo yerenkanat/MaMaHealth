@@ -79,3 +79,52 @@ meRouter.post('/weight', verifyJwt, async (req, res) => {
   );
   return res.status(204).end();
 });
+
+// История сессий подсчёта шевелений (последние 20).
+meRouter.get('/kicks', verifyJwt, async (req, res) => {
+  const userId = req.auth!.userId;
+  const { rows } = await pool.query<{
+    id: string;
+    count: number;
+    duration_seconds: number;
+    created_at: Date;
+  }>(
+    `SELECT id, count, duration_seconds, created_at
+       FROM kick_sessions WHERE user_id = $1
+      ORDER BY created_at DESC LIMIT 20`,
+    [userId]
+  );
+  return res.json(
+    rows.map((r) => ({
+      id: r.id,
+      count: r.count,
+      durationSeconds: r.duration_seconds,
+      createdAt: r.created_at,
+    }))
+  );
+});
+
+// Сохранить завершённую сессию подсчёта шевелений.
+meRouter.post('/kicks', verifyJwt, async (req, res) => {
+  const userId = req.auth!.userId;
+  const { count, durationSeconds } = req.body ?? {};
+  if (
+    typeof count !== 'number' ||
+    count <= 0 ||
+    typeof durationSeconds !== 'number' ||
+    durationSeconds < 0
+  ) {
+    return res.status(400).json({ error: 'bad_input' });
+  }
+  const { rows } = await pool.query<{ id: string; created_at: Date }>(
+    `INSERT INTO kick_sessions (user_id, count, duration_seconds)
+     VALUES ($1, $2, $3) RETURNING id, created_at`,
+    [userId, Math.round(count), Math.round(durationSeconds)]
+  );
+  return res.status(201).json({
+    id: rows[0].id,
+    count: Math.round(count),
+    durationSeconds: Math.round(durationSeconds),
+    createdAt: rows[0].created_at,
+  });
+});
