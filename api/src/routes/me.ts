@@ -176,3 +176,56 @@ meRouter.post('/contractions', verifyJwt, async (req, res) => {
     createdAt: rows[0].created_at,
   });
 });
+
+const MOODS = new Set(['great', 'good', 'ok', 'low', 'bad']);
+
+// Ежедневный лог самочувствия: последние 30 записей (новые сверху).
+meRouter.get('/daily', verifyJwt, async (req, res) => {
+  const userId = req.auth!.userId;
+  const { rows } = await pool.query<{
+    log_date: string;
+    mood: string | null;
+    symptoms: string[];
+    note: string | null;
+  }>(
+    `SELECT to_char(log_date, 'YYYY-MM-DD') AS log_date, mood, symptoms, note
+       FROM daily_logs WHERE user_id = $1
+      ORDER BY log_date DESC LIMIT 30`,
+    [userId]
+  );
+  return res.json(
+    rows.map((r) => ({
+      date: r.log_date,
+      mood: r.mood,
+      symptoms: r.symptoms,
+      note: r.note,
+    }))
+  );
+});
+
+// Создать/обновить запись за день (upsert по дате).
+meRouter.post('/daily', verifyJwt, async (req, res) => {
+  const userId = req.auth!.userId;
+  const { date, mood, symptoms, note } = req.body ?? {};
+  if (typeof date !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(date)) {
+    return res.status(400).json({ error: 'bad_date' });
+  }
+  if (mood != null && !MOODS.has(mood)) {
+    return res.status(400).json({ error: 'bad_mood' });
+  }
+  const symptomList = Array.isArray(symptoms)
+    ? symptoms.filter((s): s is string => typeof s === 'string').slice(0, 20)
+    : [];
+  const noteText = typeof note === 'string' ? note.slice(0, 500) : null;
+  await pool.query(
+    `INSERT INTO daily_logs (user_id, log_date, mood, symptoms, note)
+     VALUES ($1, $2, $3, $4, $5)
+     ON CONFLICT (user_id, log_date) DO UPDATE
+       SET mood = EXCLUDED.mood,
+           symptoms = EXCLUDED.symptoms,
+           note = EXCLUDED.note,
+           updated_at = now()`,
+    [userId, date, mood ?? null, symptomList, noteText]
+  );
+  return res.status(204).end();
+});

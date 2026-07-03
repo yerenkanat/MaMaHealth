@@ -113,6 +113,29 @@ class ContractionLog {
       );
 }
 
+class DailyLog {
+  const DailyLog({
+    required this.date,
+    required this.mood,
+    required this.symptoms,
+    required this.note,
+  });
+
+  final String date; // YYYY-MM-DD
+  final String? mood; // great | good | ok | low | bad
+  final List<String> symptoms;
+  final String? note;
+
+  factory DailyLog.fromJson(Map<String, dynamic> j) => DailyLog(
+        date: j['date'] as String,
+        mood: j['mood'] as String?,
+        symptoms: ((j['symptoms'] as List<dynamic>?) ?? const [])
+            .map((e) => e as String)
+            .toList(),
+        note: j['note'] as String?,
+      );
+}
+
 abstract interface class EngagementService {
   Future<MeProfile> me();
   Future<CheckinResult> checkin();
@@ -123,6 +146,8 @@ abstract interface class EngagementService {
   Future<void> saveKick(int count, int durationSeconds);
   Future<List<ContractionLog>> contractions();
   Future<void> saveContraction(int durationSeconds, int? intervalSeconds);
+  Future<List<DailyLog>> dailyLogs();
+  Future<void> saveDaily(String date, String? mood, List<String> symptoms, String? note);
 }
 
 /// Боевая реализация — ходит в backend.
@@ -179,6 +204,23 @@ class ApiEngagementService implements EngagementService {
     await _api.post('/me/contractions', {
       'durationSeconds': durationSeconds,
       if (intervalSeconds != null) 'intervalSeconds': intervalSeconds,
+    });
+  }
+
+  @override
+  Future<List<DailyLog>> dailyLogs() async {
+    final data = await _api.get('/me/daily') as List<dynamic>;
+    return data.map((e) => DailyLog.fromJson(e as Map<String, dynamic>)).toList();
+  }
+
+  @override
+  Future<void> saveDaily(
+      String date, String? mood, List<String> symptoms, String? note) async {
+    await _api.post('/me/daily', {
+      'date': date,
+      'mood': mood,
+      'symptoms': symptoms,
+      if (note != null && note.isNotEmpty) 'note': note,
     });
   }
 }
@@ -270,6 +312,26 @@ class DemoEngagementService implements EngagementService {
         intervalSeconds: intervalSeconds,
         createdAt: DateTime.now(),
       ),
+    );
+  }
+
+  final Map<String, DailyLog> _daily = {};
+
+  @override
+  Future<List<DailyLog>> dailyLogs() async {
+    final list = _daily.values.toList()
+      ..sort((a, b) => b.date.compareTo(a.date));
+    return list;
+  }
+
+  @override
+  Future<void> saveDaily(
+      String date, String? mood, List<String> symptoms, String? note) async {
+    _daily[date] = DailyLog(
+      date: date,
+      mood: mood,
+      symptoms: symptoms,
+      note: note,
     );
   }
 }
