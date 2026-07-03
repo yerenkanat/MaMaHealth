@@ -152,6 +152,27 @@ abstract interface class EngagementService {
   Future<void> saveChecklistState(String key, List<String> items);
   Future<List<ChatTurn>> chatHistory();
   Future<void> saveChatMessage(String role, String text);
+  Future<List<BabyEvent>> babyEvents();
+  Future<void> saveBabyEvent(String type, String? detail);
+}
+
+class BabyEvent {
+  const BabyEvent({
+    required this.type,
+    required this.detail,
+    required this.happenedAt,
+  });
+
+  final String type; // feed | sleep | diaper
+  final String? detail;
+  final DateTime happenedAt;
+
+  factory BabyEvent.fromJson(Map<String, dynamic> j) => BabyEvent(
+        type: j['type'] as String,
+        detail: j['detail'] as String?,
+        happenedAt:
+            DateTime.tryParse(j['happenedAt'] as String? ?? '') ?? DateTime.now(),
+      );
 }
 
 class ChatTurn {
@@ -260,6 +281,20 @@ class ApiEngagementService implements EngagementService {
   @override
   Future<void> saveChatMessage(String role, String text) async {
     await _api.post('/me/chat', {'role': role, 'text': text});
+  }
+
+  @override
+  Future<List<BabyEvent>> babyEvents() async {
+    final data = await _api.get('/me/baby-events') as List<dynamic>;
+    return data.map((e) => BabyEvent.fromJson(e as Map<String, dynamic>)).toList();
+  }
+
+  @override
+  Future<void> saveBabyEvent(String type, String? detail) async {
+    await _api.post('/me/baby-events', {
+      'type': type,
+      if (detail != null) 'detail': detail,
+    });
   }
 }
 
@@ -392,5 +427,18 @@ class DemoEngagementService implements EngagementService {
   @override
   Future<void> saveChatMessage(String role, String text) async {
     _chat.add(ChatTurn(role: role, text: text));
+  }
+
+  final List<BabyEvent> _babyEvents = [];
+
+  @override
+  Future<List<BabyEvent>> babyEvents() async => List.of(_babyEvents);
+
+  @override
+  Future<void> saveBabyEvent(String type, String? detail) async {
+    _babyEvents.insert(
+      0,
+      BabyEvent(type: type, detail: detail, happenedAt: DateTime.now()),
+    );
   }
 }

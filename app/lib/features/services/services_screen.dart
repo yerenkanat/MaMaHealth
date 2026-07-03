@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import 'baby/newborn_tracker_screen.dart';
 import 'blood/blood_type_screen.dart';
 import 'calendars/calendar_screens.dart';
 import 'checklist/checklist_screen.dart';
@@ -19,6 +20,7 @@ class ServicesScreen extends StatelessWidget {
 
   static const _services = <_Service>[
     _Service('Мои тренды', Icons.insights, Color(0xFFE7E0FB)),
+    _Service('Дневник малыша', Icons.baby_changing_station, Color(0xFFDCEFFB)),
     _Service('Дневник самочувствия', Icons.favorite_border, Color(0xFFFDE7D6)),
     _Service('Отчёт для врача', Icons.summarize_outlined, Color(0xFFDDF5EC)),
     _Service('Выбор имени для ребёнка', Icons.child_care, Color(0xFFDCF1F5)),
@@ -58,6 +60,8 @@ Widget _screenFor(String title) {
   switch (title) {
     case 'Мои тренды':
       return const TrendsScreen();
+    case 'Дневник малыша':
+      return const NewbornTrackerScreen();
     case 'Дневник самочувствия':
       return const DailyLogScreen();
     case 'Отчёт для врача':

@@ -281,3 +281,50 @@ meRouter.post('/chat', verifyJwt, async (req, res) => {
   );
   return res.status(204).end();
 });
+
+const BABY_TYPES = new Set(['feed', 'sleep', 'diaper']);
+
+// Дневник малыша: последние события (кормления/сон/подгузники).
+meRouter.get('/baby-events', verifyJwt, async (req, res) => {
+  const userId = req.auth!.userId;
+  const { rows } = await pool.query<{
+    id: string;
+    type: string;
+    detail: string | null;
+    happened_at: Date;
+  }>(
+    `SELECT id, type, detail, happened_at
+       FROM baby_events WHERE user_id = $1
+      ORDER BY happened_at DESC LIMIT 50`,
+    [userId]
+  );
+  return res.json(
+    rows.map((r) => ({
+      id: r.id,
+      type: r.type,
+      detail: r.detail,
+      happenedAt: r.happened_at,
+    }))
+  );
+});
+
+meRouter.post('/baby-events', verifyJwt, async (req, res) => {
+  const userId = req.auth!.userId;
+  const { type, detail } = req.body ?? {};
+  if (!BABY_TYPES.has(type)) {
+    return res.status(400).json({ error: 'bad_type' });
+  }
+  const detailText =
+    typeof detail === 'string' ? detail.slice(0, 100) : null;
+  const { rows } = await pool.query<{ id: string; happened_at: Date }>(
+    `INSERT INTO baby_events (user_id, type, detail)
+     VALUES ($1, $2, $3) RETURNING id, happened_at`,
+    [userId, type, detailText]
+  );
+  return res.status(201).json({
+    id: rows[0].id,
+    type,
+    detail: detailText,
+    happenedAt: rows[0].happened_at,
+  });
+});
