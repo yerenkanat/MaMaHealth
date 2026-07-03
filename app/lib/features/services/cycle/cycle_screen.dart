@@ -38,6 +38,7 @@ DateTime _dateOnly(DateTime d) => DateTime(d.year, d.month, d.day);
 
 class _CycleScreenState extends State<CycleScreen> {
   List<CyclePeriod> _periods = [];
+  List<DailyLog> _daily = [];
   bool _loading = true;
   late DateTime _month; // первый день видимого месяца
 
@@ -50,11 +51,13 @@ class _CycleScreenState extends State<CycleScreen> {
   }
 
   Future<void> _load() async {
+    final svc = context.read<EngagementService>();
     try {
-      final list = await context.read<EngagementService>().cycles();
+      final results = await Future.wait([svc.cycles(), svc.dailyLogs()]);
       if (!mounted) return;
       setState(() {
-        _periods = list;
+        _periods = results[0] as List<CyclePeriod>;
+        _daily = results[1] as List<DailyLog>;
         _loading = false;
       });
     } catch (_) {
@@ -136,6 +139,48 @@ class _CycleScreenState extends State<CycleScreen> {
     return _Phase.none;
   }
 
+  static const _symptomRu = <String, String>{
+    'nausea': 'Тошнота',
+    'fatigue': 'Усталость',
+    'headache': 'Головная боль',
+    'backache': 'Боль в спине',
+    'cravings': 'Тяга к еде',
+    'swelling': 'Отёки',
+    'heartburn': 'Изжога',
+    'insomnia': 'Бессонница',
+    'cramps': 'Спазмы',
+    'dizziness': 'Головокружение',
+  };
+
+  /// Симптомы, чаще всего отмечаемые в лютеиновой (пред-менструальной) фазе.
+  List<MapEntry<String, int>> _pmsSymptoms(_CycleStats s) {
+    if (_periods.isEmpty || _daily.isEmpty) return const [];
+    final startsAsc = _periods.map((p) => _dateOnly(p.start)).toList()..sort();
+    final counts = <String, int>{};
+    for (final log in _daily) {
+      final d = DateTime.tryParse(log.date);
+      if (d == null || log.symptoms.isEmpty) continue;
+      DateTime? base;
+      for (final st in startsAsc) {
+        if (!st.isAfter(d)) {
+          base = st;
+        } else {
+          break;
+        }
+      }
+      if (base == null) continue;
+      final cycleDay = d.difference(base).inDays + 1;
+      if (cycleDay >= s.avgCycle - 5 && cycleDay <= s.avgCycle + 2) {
+        for (final sym in log.symptoms) {
+          counts[sym] = (counts[sym] ?? 0) + 1;
+        }
+      }
+    }
+    final list = counts.entries.toList()
+      ..sort((a, b) => b.value.compareTo(a.value));
+    return list;
+  }
+
   Future<void> _logPeriod() async {
     final now = DateTime.now();
     final svc = context.read<EngagementService>();
@@ -196,8 +241,60 @@ class _CycleScreenState extends State<CycleScreen> {
         const SizedBox(height: 16),
         const _Legend(),
         const SizedBox(height: 16),
+        _PmsCard(symptoms: _pmsSymptoms(s), label: (k) => _symptomRu[k] ?? k),
+        const SizedBox(height: 16),
         if (_periods.isNotEmpty) _History(periods: _periods),
       ],
+    );
+  }
+}
+
+class _PmsCard extends StatelessWidget {
+  const _PmsCard({required this.symptoms, required this.label});
+  final List<MapEntry<String, int>> symptoms;
+  final String Function(String) label;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Row(
+            children: [
+              Icon(Icons.insights, size: 20, color: Color(0xFFFF6B81)),
+              SizedBox(width: 8),
+              Text('Симптомы перед месячными',
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700)),
+            ],
+          ),
+          const SizedBox(height: 10),
+          if (symptoms.isEmpty)
+            const Text(
+              'Отмечайте самочувствие в дневнике — здесь появятся ваши ПМС-паттерны.',
+              style: TextStyle(color: Colors.black54, fontSize: 13),
+            )
+          else
+            Wrap(
+              spacing: 8,
+              runSpacing: 8,
+              children: [
+                for (final e in symptoms.take(5))
+                  Chip(
+                    backgroundColor: const Color(0xFFFFE0E6),
+                    side: BorderSide.none,
+                    label: Text('${label(e.key)} · ${e.value}',
+                        style: const TextStyle(fontSize: 13)),
+                  ),
+              ],
+            ),
+        ],
+      ),
     );
   }
 }
