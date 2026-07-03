@@ -5,6 +5,7 @@ import 'calendars/calendar_screens.dart';
 import 'checklist/checklist_screen.dart';
 import 'contractions/contraction_screen.dart';
 import 'daily/daily_log_screen.dart';
+import 'report/doctor_report_screen.dart';
 import 'kick/kick_counter_screen.dart';
 import 'names/baby_names_screen.dart';
 import 'tips/allowed_screen.dart';
@@ -17,6 +18,7 @@ class ServicesScreen extends StatelessWidget {
 
   static const _services = <_Service>[
     _Service('Дневник самочувствия', Icons.favorite_border, Color(0xFFFDE7D6)),
+    _Service('Отчёт для врача', Icons.summarize_outlined, Color(0xFFDDF5EC)),
     _Service('Выбор имени для ребёнка', Icons.child_care, Color(0xFFDCF1F5)),
     _Service('Чеклисты', Icons.checklist, Color(0xFFFBE0EC)),
     _Service('Календарь беременности', Icons.calendar_month, Color(0xFFE7E0FB)),
@@ -54,6 +56,8 @@ Widget _screenFor(String title) {
   switch (title) {
     case 'Дневник самочувствия':
       return const DailyLogScreen();
+    case 'Отчёт для врача':
+      return const DoctorReportScreen();
     case 'Счётчик схваток':
       return const ContractionScreen();
     case 'Счётчик толчков':
