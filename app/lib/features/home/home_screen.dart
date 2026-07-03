@@ -8,6 +8,7 @@ import '../birth_trigger/bloc/birth_trigger_bloc.dart';
 import '../birth_trigger/widgets/birth_form_sheet.dart';
 import '../birth_trigger/widgets/confetti_overlay.dart';
 import '../child/widgets/child_calendar.dart';
+import '../engagement/engagement_service.dart';
 import '../engagement/reminders_screen.dart';
 import '../pregnancy/widgets/pregnancy_calendar.dart';
 import '../profile_switch/bloc/profile_switch_bloc.dart';
@@ -22,6 +23,40 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   int _kicks = 0; // локальный UI-счётчик шевелений (не часть доменного state)
+  int _reminderCount = 0; // для бейджа на колокольчике
+
+  @override
+  void initState() {
+    super.initState();
+    _dailyCheckin();
+    _loadReminderCount();
+  }
+
+  /// Ежедневный чек-ин при открытии: продлевает стрик и награждает баллами.
+  Future<void> _dailyCheckin() async {
+    try {
+      final res = await context.read<EngagementService>().checkin();
+      if (res.awarded && mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('🔥 Серия ${res.streak} дн. подряд · +10 баллов'),
+            duration: const Duration(seconds: 3),
+          ),
+        );
+      }
+    } catch (_) {
+      // офлайн/демо — молча пропускаем
+    }
+  }
+
+  Future<void> _loadReminderCount() async {
+    try {
+      final items = await context.read<EngagementService>().reminders();
+      if (mounted) setState(() => _reminderCount = items.length);
+    } catch (_) {
+      // игнорируем — бейдж просто не покажем
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -62,6 +97,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 state: state,
                 profile: profile,
                 kicks: _kicks,
+                reminderCount: _reminderCount,
                 onKick: () => setState(() => _kicks++),
               );
           }
@@ -76,12 +112,14 @@ class _ProfileView extends StatelessWidget {
     required this.state,
     required this.profile,
     required this.kicks,
+    required this.reminderCount,
     required this.onKick,
   });
 
   final ProfileSwitchState state;
   final Profile profile;
   final int kicks;
+  final int reminderCount;
   final VoidCallback onKick;
 
   @override
@@ -95,7 +133,12 @@ class _ProfileView extends StatelessWidget {
           title: Text(profile.title),
           actions: [
             IconButton(
-              icon: const Icon(Icons.notifications_none),
+              icon: reminderCount > 0
+                  ? Badge.count(
+                      count: reminderCount,
+                      child: const Icon(Icons.notifications_none),
+                    )
+                  : const Icon(Icons.notifications_none),
               tooltip: 'Напоминания',
               onPressed: () => Navigator.of(context).push(
                 MaterialPageRoute(builder: (_) => const RemindersScreen()),
