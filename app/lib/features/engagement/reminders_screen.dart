@@ -10,6 +10,7 @@ class RemindersScreen extends StatelessWidget {
   IconData _icon(String category) => switch (category) {
         'vaccination' => Icons.vaccines,
         'screening' => Icons.monitor_heart_outlined,
+        'cycle' => Icons.water_drop,
         _ => Icons.event_available,
       };
 
