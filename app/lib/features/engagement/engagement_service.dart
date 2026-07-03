@@ -94,6 +94,25 @@ class KickSession {
       );
 }
 
+class ContractionLog {
+  const ContractionLog({
+    required this.durationSeconds,
+    required this.intervalSeconds,
+    required this.createdAt,
+  });
+
+  final int durationSeconds;
+  final int? intervalSeconds;
+  final DateTime createdAt;
+
+  factory ContractionLog.fromJson(Map<String, dynamic> j) => ContractionLog(
+        durationSeconds: (j['durationSeconds'] as num).toInt(),
+        intervalSeconds: (j['intervalSeconds'] as num?)?.toInt(),
+        createdAt:
+            DateTime.tryParse(j['createdAt'] as String? ?? '') ?? DateTime.now(),
+      );
+}
+
 abstract interface class EngagementService {
   Future<MeProfile> me();
   Future<CheckinResult> checkin();
@@ -102,6 +121,8 @@ abstract interface class EngagementService {
   Future<void> saveWeight(int week, double gainKg);
   Future<List<KickSession>> kicks();
   Future<void> saveKick(int count, int durationSeconds);
+  Future<List<ContractionLog>> contractions();
+  Future<void> saveContraction(int durationSeconds, int? intervalSeconds);
 }
 
 /// Боевая реализация — ходит в backend.
@@ -143,6 +164,22 @@ class ApiEngagementService implements EngagementService {
   @override
   Future<void> saveKick(int count, int durationSeconds) async {
     await _api.post('/me/kicks', {'count': count, 'durationSeconds': durationSeconds});
+  }
+
+  @override
+  Future<List<ContractionLog>> contractions() async {
+    final data = await _api.get('/me/contractions') as List<dynamic>;
+    return data
+        .map((e) => ContractionLog.fromJson(e as Map<String, dynamic>))
+        .toList();
+  }
+
+  @override
+  Future<void> saveContraction(int durationSeconds, int? intervalSeconds) async {
+    await _api.post('/me/contractions', {
+      'durationSeconds': durationSeconds,
+      if (intervalSeconds != null) 'intervalSeconds': intervalSeconds,
+    });
   }
 }
 
@@ -214,6 +251,23 @@ class DemoEngagementService implements EngagementService {
       KickSession(
         count: count,
         durationSeconds: durationSeconds,
+        createdAt: DateTime.now(),
+      ),
+    );
+  }
+
+  final List<ContractionLog> _contractions = [];
+
+  @override
+  Future<List<ContractionLog>> contractions() async => List.of(_contractions);
+
+  @override
+  Future<void> saveContraction(int durationSeconds, int? intervalSeconds) async {
+    _contractions.insert(
+      0,
+      ContractionLog(
+        durationSeconds: durationSeconds,
+        intervalSeconds: intervalSeconds,
         createdAt: DateTime.now(),
       ),
     );

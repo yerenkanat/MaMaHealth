@@ -1,8 +1,10 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../core/theme/app_theme.dart';
+import '../../engagement/engagement_service.dart';
 
 /// Счётчик схваток: тап старт/стоп, длительность и интервал, подсказка «пора в роддом».
 class ContractionScreen extends StatefulWidget {
@@ -27,6 +29,32 @@ class _ContractionScreenState extends State<ContractionScreen> {
 
   bool get _running => _runningStart != null;
 
+  @override
+  void initState() {
+    super.initState();
+    _loadHistory();
+  }
+
+  Future<void> _loadHistory() async {
+    try {
+      final logs = await context.read<EngagementService>().contractions();
+      if (!mounted) return;
+      setState(() {
+        _list
+          ..clear()
+          ..addAll(logs.map((l) => _Contraction(
+                l.createdAt,
+                Duration(seconds: l.durationSeconds),
+                l.intervalSeconds == null
+                    ? null
+                    : Duration(seconds: l.intervalSeconds!),
+              )));
+      });
+    } catch (_) {
+      // офлайн/демо — начинаем с пустого списка
+    }
+  }
+
   void _toggle() {
     HapticFeedback.mediumImpact();
     if (!_running) {
@@ -46,6 +74,21 @@ class _ContractionScreenState extends State<ContractionScreen> {
         _runningStart = null;
         _elapsed = Duration.zero;
       });
+      _persist(dur, interval);
+    }
+  }
+
+  Future<void> _persist(Duration dur, Duration? interval) async {
+    try {
+      await context
+          .read<EngagementService>()
+          .saveContraction(dur.inSeconds, interval?.inSeconds);
+    } catch (_) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Не удалось сохранить схватку')),
+        );
+      }
     }
   }
 

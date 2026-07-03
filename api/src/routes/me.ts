@@ -128,3 +128,51 @@ meRouter.post('/kicks', verifyJwt, async (req, res) => {
     createdAt: rows[0].created_at,
   });
 });
+
+// История схваток (последние 30, новые сверху).
+meRouter.get('/contractions', verifyJwt, async (req, res) => {
+  const userId = req.auth!.userId;
+  const { rows } = await pool.query<{
+    id: string;
+    duration_seconds: number;
+    interval_seconds: number | null;
+    created_at: Date;
+  }>(
+    `SELECT id, duration_seconds, interval_seconds, created_at
+       FROM contraction_logs WHERE user_id = $1
+      ORDER BY created_at DESC LIMIT 30`,
+    [userId]
+  );
+  return res.json(
+    rows.map((r) => ({
+      id: r.id,
+      durationSeconds: r.duration_seconds,
+      intervalSeconds: r.interval_seconds,
+      createdAt: r.created_at,
+    }))
+  );
+});
+
+// Записать завершённую схватку.
+meRouter.post('/contractions', verifyJwt, async (req, res) => {
+  const userId = req.auth!.userId;
+  const { durationSeconds, intervalSeconds } = req.body ?? {};
+  if (typeof durationSeconds !== 'number' || durationSeconds < 0) {
+    return res.status(400).json({ error: 'bad_input' });
+  }
+  const interval =
+    typeof intervalSeconds === 'number' && intervalSeconds >= 0
+      ? Math.round(intervalSeconds)
+      : null;
+  const { rows } = await pool.query<{ id: string; created_at: Date }>(
+    `INSERT INTO contraction_logs (user_id, duration_seconds, interval_seconds)
+     VALUES ($1, $2, $3) RETURNING id, created_at`,
+    [userId, Math.round(durationSeconds), interval]
+  );
+  return res.status(201).json({
+    id: rows[0].id,
+    durationSeconds: Math.round(durationSeconds),
+    intervalSeconds: interval,
+    createdAt: rows[0].created_at,
+  });
+});
