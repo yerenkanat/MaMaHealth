@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../../core/theme/app_theme.dart';
 
-/// Вкладка «Видео» — обучающая лента (карточки; плеер подключим позже).
+/// Вкладка «Видео» — обучающая лента. Тап открывает подборку на YouTube.
 class VideoScreen extends StatelessWidget {
   const VideoScreen({super.key});
 
@@ -41,9 +42,22 @@ class _VideoCard extends StatelessWidget {
   const _VideoCard({required this.video});
   final _Video video;
 
+  Future<void> _open(BuildContext context) async {
+    final query = Uri.encodeComponent('${video.title} ${video.category}');
+    final uri = Uri.parse('https://www.youtube.com/results?search_query=$query');
+    final ok = await launchUrl(uri, mode: LaunchMode.externalApplication);
+    if (!ok && context.mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Не удалось открыть видео')),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Column(
+    return GestureDetector(
+      onTap: () => _open(context),
+      child: Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         AspectRatio(
@@ -97,6 +111,7 @@ class _VideoCard extends StatelessWidget {
         Text(video.title,
             style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w700)),
       ],
+      ),
     );
   }
 }
