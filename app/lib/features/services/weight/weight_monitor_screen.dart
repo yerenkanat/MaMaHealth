@@ -1,6 +1,9 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+
+import '../../engagement/engagement_service.dart';
 
 /// Монитор прибавки веса мамы: график прибавки (кг) по неделям + рекомендуемый коридор.
 class WeightMonitorScreen extends StatefulWidget {
@@ -11,13 +14,31 @@ class WeightMonitorScreen extends StatefulWidget {
 }
 
 class _WeightMonitorScreenState extends State<WeightMonitorScreen> {
-  // Демо-замеры: (неделя, прибавка в кг).
-  final List<MapEntry<int, double>> _points = [
-    const MapEntry(8, 0.5),
-    const MapEntry(16, 2.5),
-    const MapEntry(24, 6.0),
-    const MapEntry(30, 9.0),
-  ];
+  // Замеры (неделя, прибавка в кг) — грузятся из EngagementService.
+  final List<MapEntry<int, double>> _points = [];
+  bool _loading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _load();
+  }
+
+  Future<void> _load() async {
+    try {
+      final data = await context.read<EngagementService>().weight();
+      if (!mounted) return;
+      setState(() {
+        _points
+          ..clear()
+          ..addAll(data.map((p) => MapEntry(p.week, p.gainKg)));
+        _points.sort((a, b) => a.key.compareTo(b.key));
+        _loading = false;
+      });
+    } catch (_) {
+      if (mounted) setState(() => _loading = false);
+    }
+  }
 
   // Рекомендуемый коридор прибавки (нормальный ИМТ), опорные точки.
   static const _refWeeks = [0, 13, 20, 28, 40];
@@ -30,6 +51,7 @@ class _WeightMonitorScreenState extends State<WeightMonitorScreen> {
   double get _lastGain => _points.isEmpty ? 0 : _points.last.value;
 
   Future<void> _add() async {
+    final svc = context.read<EngagementService>();
     final res = await showDialog<MapEntry<int, double>>(
       context: context,
       builder: (_) => const _AddWeightDialog(),
@@ -41,6 +63,15 @@ class _WeightMonitorScreenState extends State<WeightMonitorScreen> {
           ..add(res);
         _points.sort((a, b) => a.key.compareTo(b.key));
       });
+      try {
+        await svc.saveWeight(res.key, res.value);
+      } catch (_) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Не удалось сохранить замер')),
+          );
+        }
+      }
     }
   }
 
@@ -54,7 +85,9 @@ class _WeightMonitorScreenState extends State<WeightMonitorScreen> {
         icon: const Icon(Icons.add),
         label: const Text('Замер'),
       ),
-      body: Column(
+      body: _loading
+          ? const Center(child: CircularProgressIndicator())
+          : Column(
         children: [
           Padding(
             padding: const EdgeInsets.all(16),

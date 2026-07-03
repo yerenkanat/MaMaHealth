@@ -1,38 +1,86 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../core/theme/app_theme.dart';
 import '../../domain/models/profile.dart';
+import '../engagement/engagement_service.dart';
 import '../profile_switch/bloc/profile_switch_bloc.dart';
 
-class ProfileScreen extends StatelessWidget {
+class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
 
   @override
+  State<ProfileScreen> createState() => _ProfileScreenState();
+}
+
+class _ProfileScreenState extends State<ProfileScreen> {
+  MeProfile? _me;
+
+  @override
+  void initState() {
+    super.initState();
+    _load();
+  }
+
+  Future<void> _load() async {
+    final svc = context.read<EngagementService>();
+    try {
+      await svc.checkin(); // продлить streak и начислить баллы за вход
+      final me = await svc.me();
+      if (mounted) setState(() => _me = me);
+    } catch (_) {
+      // офлайн/ошибка — оставляем дефолты
+    }
+  }
+
+  void _toast(String msg) {
+    ScaffoldMessenger.of(context)
+        .showSnackBar(SnackBar(content: Text(msg)));
+  }
+
+  void _invite() {
+    const code = 'MAMA-2026';
+    Clipboard.setData(const ClipboardData(text: code));
+    _toast('Реферальный код $code скопирован — поделитесь с друзьями!');
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final me = _me;
     return Scaffold(
       appBar: AppBar(
         title: const Text('Мой профиль'),
-        actions: const [Icon(Icons.settings_outlined), SizedBox(width: 16)],
-      ),
-      body: ListView(
-        padding: const EdgeInsets.all(16),
-        children: const [
-          _HeaderCard(),
-          SizedBox(height: 12),
-          _ChildrenCard(),
-          SizedBox(height: 12),
-          _PointsCard(),
-          SizedBox(height: 20),
-          _FavoritesSection(),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.settings_outlined),
+            onPressed: () => _toast('Настройки — скоро'),
+          ),
+          const SizedBox(width: 8),
         ],
+      ),
+      body: RefreshIndicator(
+        onRefresh: _load,
+        child: ListView(
+          padding: const EdgeInsets.all(16),
+          children: [
+            _HeaderCard(me: me),
+            const SizedBox(height: 12),
+            const _ChildrenCard(),
+            const SizedBox(height: 12),
+            _PointsCard(points: me?.points ?? 0, onInvite: _invite),
+            const SizedBox(height: 20),
+            _FavoritesSection(onTap: (t) => _toast('$t — скоро')),
+          ],
+        ),
       ),
     );
   }
 }
 
 class _HeaderCard extends StatelessWidget {
-  const _HeaderCard();
+  const _HeaderCard({required this.me});
+  final MeProfile? me;
 
   @override
   Widget build(BuildContext context) {
@@ -53,59 +101,36 @@ class _HeaderCard extends StatelessWidget {
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
               decoration: BoxDecoration(
-                color: const Color(0xFFEDE7FB),
+                color: const Color(0xFFFDE7D6),
                 borderRadius: BorderRadius.circular(20),
               ),
-              child: const Text('29 · уровень',
-                  style: TextStyle(
-                      color: Color(0xFF6A4BD0), fontWeight: FontWeight.w600)),
+              child: Text('🔥 ${me?.streak ?? 0} дней подряд',
+                  style: const TextStyle(
+                      color: Color(0xFFE07B39), fontWeight: FontWeight.w600)),
             ),
             const SizedBox(height: 8),
-            const Text('Алматы, Қазақстан',
-                style: TextStyle(color: Colors.black45)),
+            Text(me?.city ?? '—', style: const TextStyle(color: Colors.black45)),
             const SizedBox(height: 4),
-            const Text('Айман',
-                style: TextStyle(fontSize: 24, fontWeight: FontWeight.w700)),
-            const SizedBox(height: 8),
-            const Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                _Stat(value: '413', label: 'подписчиков'),
-                SizedBox(width: 24),
-                _Stat(value: '39 911', label: 'подписки'),
-              ],
-            ),
+            Text(me?.name ?? 'Мама',
+                style:
+                    const TextStyle(fontSize: 24, fontWeight: FontWeight.w700)),
             const SizedBox(height: 12),
             const ListTile(
               contentPadding: EdgeInsets.zero,
               leading: CircleAvatar(
                 backgroundColor: Color(0xFFE7E0FB),
-                child: Icon(Icons.emoji_emotions_outlined, color: Color(0xFF6A4BD0)),
+                child:
+                    Icon(Icons.emoji_emotions_outlined, color: Color(0xFF6A4BD0)),
               ),
-              title: Text('Мой статус', style: TextStyle(color: Colors.black45, fontSize: 13)),
-              subtitle: Text('Я мама', style: TextStyle(color: Colors.black87, fontSize: 16)),
+              title: Text('Мой статус',
+                  style: TextStyle(color: Colors.black45, fontSize: 13)),
+              subtitle: Text('Я мама',
+                  style: TextStyle(color: Colors.black87, fontSize: 16)),
               trailing: Icon(Icons.unfold_more),
             ),
           ],
         ),
       ),
-    );
-  }
-}
-
-class _Stat extends StatelessWidget {
-  const _Stat({required this.value, required this.label});
-  final String value;
-  final String label;
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      children: [
-        Text(value, style: const TextStyle(fontWeight: FontWeight.w700)),
-        const SizedBox(width: 4),
-        Text(label, style: const TextStyle(color: Colors.black45)),
-      ],
     );
   }
 }
@@ -161,7 +186,9 @@ class _ChildrenCard extends StatelessWidget {
 }
 
 class _PointsCard extends StatelessWidget {
-  const _PointsCard();
+  const _PointsCard({required this.points, required this.onInvite});
+  final int points;
+  final VoidCallback onInvite;
 
   @override
   Widget build(BuildContext context) {
@@ -174,14 +201,15 @@ class _PointsCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Row(
+            Row(
               children: [
-                Icon(Icons.stars, color: AppColors.peach),
-                SizedBox(width: 10),
-                Text('1000 баллов',
-                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.w700)),
-                Spacer(),
-                Icon(Icons.chevron_right, color: Colors.black38),
+                const Icon(Icons.stars, color: AppColors.peach),
+                const SizedBox(width: 10),
+                Text('$points баллов',
+                    style: const TextStyle(
+                        fontSize: 20, fontWeight: FontWeight.w700)),
+                const Spacer(),
+                const Icon(Icons.chevron_right, color: Colors.black38),
               ],
             ),
             const SizedBox(height: 12),
@@ -196,7 +224,7 @@ class _PointsCard extends StatelessWidget {
                       style: TextStyle(color: Colors.black54)),
                 ),
                 FilledButton.tonal(
-                  onPressed: () {},
+                  onPressed: onInvite,
                   child: const Text('Пригласить'),
                 ),
               ],
@@ -209,7 +237,8 @@ class _PointsCard extends StatelessWidget {
 }
 
 class _FavoritesSection extends StatelessWidget {
-  const _FavoritesSection();
+  const _FavoritesSection({required this.onTap});
+  final ValueChanged<String> onTap;
 
   @override
   Widget build(BuildContext context) {
@@ -217,13 +246,28 @@ class _FavoritesSection extends StatelessWidget {
       elevation: 0,
       color: Colors.white,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-      child: const Column(
+      child: Column(
         children: [
-          ListTile(leading: Icon(Icons.edit_outlined), title: Text('Мои посты'), trailing: Icon(Icons.chevron_right)),
-          Divider(height: 1),
-          ListTile(leading: Icon(Icons.shopping_bag_outlined), title: Text('Мои заказы'), trailing: Icon(Icons.chevron_right)),
-          Divider(height: 1),
-          ListTile(leading: Icon(Icons.help_outline), title: Text('Мои вопросы'), trailing: Icon(Icons.chevron_right)),
+          ListTile(
+            leading: const Icon(Icons.edit_outlined),
+            title: const Text('Мои посты'),
+            trailing: const Icon(Icons.chevron_right),
+            onTap: () => onTap('Мои посты'),
+          ),
+          const Divider(height: 1),
+          ListTile(
+            leading: const Icon(Icons.shopping_bag_outlined),
+            title: const Text('Мои заказы'),
+            trailing: const Icon(Icons.chevron_right),
+            onTap: () => onTap('Мои заказы'),
+          ),
+          const Divider(height: 1),
+          ListTile(
+            leading: const Icon(Icons.help_outline),
+            title: const Text('Мои вопросы'),
+            trailing: const Icon(Icons.chevron_right),
+            onTap: () => onTap('Мои вопросы'),
+          ),
         ],
       ),
     );

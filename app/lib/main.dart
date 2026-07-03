@@ -11,6 +11,7 @@ import 'data/repositories/parenthood_repository.dart';
 import 'features/assistant/api_assistant_service.dart';
 import 'features/assistant/assistant_service.dart';
 import 'features/birth_trigger/bloc/birth_trigger_bloc.dart';
+import 'features/engagement/engagement_service.dart';
 import 'features/profile_switch/bloc/profile_switch_bloc.dart';
 import 'features/shell/main_shell.dart';
 
@@ -25,25 +26,38 @@ Future<void> main() async {
 
   final ParenthoodRepository repository;
   final AssistantService assistant;
+  final EngagementService engagement;
   if (_useApi) {
     final tokens = InMemoryTokenStore();
     final api = ApiClient(baseUrl: _apiBaseUrl, tokenStore: tokens);
     await AuthGateway(api, tokens).ensureSignedIn();
     repository = ApiParenthoodRepository(api);
     assistant = ApiAssistantService(api);
+    engagement = ApiEngagementService(api);
   } else {
     repository = InMemoryParenthoodRepository();
     assistant = LocalAssistantService();
+    engagement = DemoEngagementService();
   }
 
-  runApp(MaMaApp(repository: repository, assistant: assistant));
+  runApp(MaMaApp(
+    repository: repository,
+    assistant: assistant,
+    engagement: engagement,
+  ));
 }
 
 class MaMaApp extends StatelessWidget {
-  const MaMaApp({super.key, required this.repository, required this.assistant});
+  const MaMaApp({
+    super.key,
+    required this.repository,
+    required this.assistant,
+    required this.engagement,
+  });
 
   final ParenthoodRepository repository;
   final AssistantService assistant;
+  final EngagementService engagement;
 
   @override
   Widget build(BuildContext context) {
@@ -51,6 +65,7 @@ class MaMaApp extends StatelessWidget {
       providers: [
         RepositoryProvider.value(value: repository),
         RepositoryProvider.value(value: assistant),
+        RepositoryProvider.value(value: engagement),
       ],
       child: MultiBlocProvider(
         providers: [

@@ -8,6 +8,7 @@ import '../birth_trigger/bloc/birth_trigger_bloc.dart';
 import '../birth_trigger/widgets/birth_form_sheet.dart';
 import '../birth_trigger/widgets/confetti_overlay.dart';
 import '../child/widgets/child_calendar.dart';
+import '../engagement/reminders_screen.dart';
 import '../pregnancy/widgets/pregnancy_calendar.dart';
 import '../profile_switch/bloc/profile_switch_bloc.dart';
 import '../timeline/widgets/journey_timeline.dart';
@@ -93,6 +94,13 @@ class _ProfileView extends StatelessWidget {
         appBar: AppBar(
           title: Text(profile.title),
           actions: [
+            IconButton(
+              icon: const Icon(Icons.notifications_none),
+              tooltip: 'Напоминания',
+              onPressed: () => Navigator.of(context).push(
+                MaterialPageRoute(builder: (_) => const RemindersScreen()),
+              ),
+            ),
             if (state.profiles.length > 1)
               PopupMenuButton<String>(
                 icon: const Icon(Icons.swap_horiz),
