@@ -26,7 +26,10 @@ class _KickCounterScreenState extends State<KickCounterScreen> {
   }
 
   void _reloadHistory() {
-    setState(() => _history = context.read<EngagementService>().kicks());
+    final future = context.read<EngagementService>().kicks();
+    setState(() {
+      _history = future;
+    });
   }
 
   void _onKick() {
