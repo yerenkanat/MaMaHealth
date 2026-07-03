@@ -282,6 +282,28 @@ meRouter.post('/chat', verifyJwt, async (req, res) => {
   return res.status(204).end();
 });
 
+// Онбординг: задать/обновить ПДР активной беременности (пересчёт недели — в /profiles).
+meRouter.post('/pregnancy', verifyJwt, async (req, res) => {
+  const userId = req.auth!.userId;
+  const { dueDate } = req.body ?? {};
+  if (typeof dueDate !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(dueDate)) {
+    return res.status(400).json({ error: 'bad_date' });
+  }
+  const updated = await pool.query(
+    `UPDATE pregnancies SET due_date = $2
+      WHERE user_id = $1 AND status = 'active'`,
+    [userId, dueDate]
+  );
+  if (updated.rowCount === 0) {
+    await pool.query(
+      `INSERT INTO pregnancies (user_id, due_date, status)
+       VALUES ($1, $2, 'active')`,
+      [userId, dueDate]
+    );
+  }
+  return res.status(204).end();
+});
+
 const BABY_TYPES = new Set(['feed', 'sleep', 'diaper']);
 
 // Дневник малыша: последние события (кормления/сон/подгузники).

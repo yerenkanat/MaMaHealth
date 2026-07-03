@@ -5,6 +5,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../core/theme/app_theme.dart';
 import '../../domain/models/profile.dart';
 import '../engagement/engagement_service.dart';
+import '../onboarding/due_date_screen.dart';
 import '../profile_switch/bloc/profile_switch_bloc.dart';
 import '../services/trends/trends_screen.dart';
 
@@ -55,7 +56,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
         actions: [
           IconButton(
             icon: const Icon(Icons.settings_outlined),
-            onPressed: () => _toast('Настройки — скоро'),
+            tooltip: 'Срок беременности',
+            onPressed: () => Navigator.of(context).push(
+              MaterialPageRoute(builder: (_) => const DueDateScreen()),
+            ),
           ),
           const SizedBox(width: 8),
         ],

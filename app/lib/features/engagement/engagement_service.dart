@@ -154,6 +154,7 @@ abstract interface class EngagementService {
   Future<void> saveChatMessage(String role, String text);
   Future<List<BabyEvent>> babyEvents();
   Future<void> saveBabyEvent(String type, String? detail);
+  Future<void> setDueDate(String date);
 }
 
 class BabyEvent {
@@ -295,6 +296,11 @@ class ApiEngagementService implements EngagementService {
       'type': type,
       if (detail != null) 'detail': detail,
     });
+  }
+
+  @override
+  Future<void> setDueDate(String date) async {
+    await _api.post('/me/pregnancy', {'dueDate': date});
   }
 }
 
@@ -440,5 +446,10 @@ class DemoEngagementService implements EngagementService {
       0,
       BabyEvent(type: type, detail: detail, happenedAt: DateTime.now()),
     );
+  }
+
+  @override
+  Future<void> setDueDate(String date) async {
+    // демо: срок не влияет на статичный InMemory-профиль
   }
 }
