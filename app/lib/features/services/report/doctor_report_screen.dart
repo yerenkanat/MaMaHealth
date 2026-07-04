@@ -20,6 +20,7 @@ class _ReportData {
     required this.kicks,
     required this.contractions,
     required this.daily,
+    required this.cycles,
   });
 
   final MeProfile me;
@@ -27,6 +28,31 @@ class _ReportData {
   final List<KickSession> kicks;
   final List<ContractionLog> contractions;
   final List<DailyLog> daily;
+  final List<CyclePeriod> cycles;
+}
+
+String _fmtDate(DateTime d) =>
+    '${d.day.toString().padLeft(2, '0')}.${d.month.toString().padLeft(2, '0')}.${d.year}';
+
+/// Строки для отчёта по циклу: последние периоды + средняя длина цикла.
+List<String> _cycleLines(List<CyclePeriod> cycles) {
+  if (cycles.isEmpty) return const ['нет данных'];
+  final asc = [...cycles]..sort((a, b) => a.start.compareTo(b.start));
+  final gaps = <int>[];
+  for (var i = 1; i < asc.length; i++) {
+    gaps.add(asc[i].start.difference(asc[i - 1].start).inDays);
+  }
+  final lines = <String>[];
+  if (gaps.isNotEmpty) {
+    final avg = (gaps.reduce((a, b) => a + b) / gaps.length).round();
+    lines.add('Средний цикл: $avg дн.');
+  }
+  for (final c in cycles.take(4)) {
+    lines.add(c.end == null
+        ? 'с ${_fmtDate(c.start)}'
+        : '${_fmtDate(c.start)} – ${_fmtDate(c.end!)}');
+  }
+  return lines;
 }
 
 const _symptomRu = <String, String>{
@@ -67,6 +93,7 @@ class _DoctorReportScreenState extends State<DoctorReportScreen> {
       svc.kicks(),
       svc.contractions(),
       svc.dailyLogs(),
+      svc.cycles(),
     ]);
     return _ReportData(
       me: results[0] as MeProfile,
@@ -74,6 +101,7 @@ class _DoctorReportScreenState extends State<DoctorReportScreen> {
       kicks: results[2] as List<KickSession>,
       contractions: results[3] as List<ContractionLog>,
       daily: results[4] as List<DailyLog>,
+      cycles: results[5] as List<CyclePeriod>,
     );
   }
 
@@ -133,6 +161,12 @@ class _DoctorReportScreenState extends State<DoctorReportScreen> {
             : ' (${l.symptoms.map((s) => _symptomRu[s] ?? s).join(', ')})';
         b.writeln('  ${l.date}$mood$sym');
       }
+    }
+    b.writeln('');
+
+    b.writeln('МЕНСТРУАЛЬНЫЙ ЦИКЛ:');
+    for (final line in _cycleLines(d.cycles)) {
+      b.writeln('  $line');
     }
     return b.toString();
   }
@@ -206,6 +240,11 @@ class _DoctorReportScreenState extends State<DoctorReportScreen> {
                                   : ' (${l.symptoms.map((s) => _symptomRu[s] ?? s).join(', ')})';
                               return '${l.date}$mood$sym';
                             }).toList(),
+                    ),
+                    _Section(
+                      icon: Icons.calendar_today,
+                      title: 'Менструальный цикл',
+                      lines: _cycleLines(d.cycles),
                     ),
                   ],
                 ),
