@@ -444,7 +444,20 @@ meRouter.get('/insights', verifyJwt, async (req, res) => {
     insights.push({ text: `Отличная серия — ${streak} дн. подряд! Так держать 💪`, emoji: '🔥' });
   }
 
-  return res.json(insights.slice(0, 3));
+  // 4) Вода за сегодня
+  const water = await pool.query<{ glasses: number }>(
+    `SELECT glasses FROM water_logs WHERE user_id = $1 AND log_date = CURRENT_DATE`,
+    [userId]
+  );
+  const glasses = water.rows[0]?.glasses ?? 0;
+  if (glasses < 6) {
+    insights.push({
+      text: `Сегодня выпито ${glasses} из 8 стаканов воды — не забывайте пить.`,
+      emoji: '💧',
+    });
+  }
+
+  return res.json(insights.slice(0, 4));
 });
 
 const BABY_TYPES = new Set(['feed', 'sleep', 'diaper']);
