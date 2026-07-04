@@ -341,6 +341,34 @@ meRouter.post('/pregnancy', verifyJwt, async (req, res) => {
   return res.status(204).end();
 });
 
+// Трекер воды: количество стаканов за сегодня.
+meRouter.get('/water', verifyJwt, async (req, res) => {
+  const userId = req.auth!.userId;
+  const { rows } = await pool.query<{ glasses: number }>(
+    `SELECT glasses FROM water_logs
+      WHERE user_id = $1 AND log_date = CURRENT_DATE`,
+    [userId]
+  );
+  return res.json({ glasses: rows[0]?.glasses ?? 0 });
+});
+
+meRouter.post('/water', verifyJwt, async (req, res) => {
+  const userId = req.auth!.userId;
+  const { glasses } = req.body ?? {};
+  if (typeof glasses !== 'number' || glasses < 0) {
+    return res.status(400).json({ error: 'bad_input' });
+  }
+  const clamped = Math.min(30, Math.round(glasses));
+  await pool.query(
+    `INSERT INTO water_logs (user_id, log_date, glasses)
+     VALUES ($1, CURRENT_DATE, $2)
+     ON CONFLICT (user_id, log_date)
+       DO UPDATE SET glasses = EXCLUDED.glasses, updated_at = now()`,
+    [userId, clamped]
+  );
+  return res.json({ glasses: clamped });
+});
+
 // Проактивные подсказки ассистента, вычисленные из данных пользователя.
 meRouter.get('/insights', verifyJwt, async (req, res) => {
   const userId = req.auth!.userId;

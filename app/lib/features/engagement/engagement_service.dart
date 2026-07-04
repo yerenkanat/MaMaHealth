@@ -158,6 +158,8 @@ abstract interface class EngagementService {
   Future<List<CyclePeriod>> cycles();
   Future<void> saveCycle(DateTime start, DateTime? end);
   Future<List<Insight>> insights();
+  Future<int> waterToday();
+  Future<int> setWater(int glasses);
 }
 
 class Insight {
@@ -351,6 +353,19 @@ class ApiEngagementService implements EngagementService {
     final data = await _api.get('/me/insights') as List<dynamic>;
     return data.map((e) => Insight.fromJson(e as Map<String, dynamic>)).toList();
   }
+
+  @override
+  Future<int> waterToday() async {
+    final data = await _api.get('/me/water') as Map<String, dynamic>;
+    return (data['glasses'] as num?)?.toInt() ?? 0;
+  }
+
+  @override
+  Future<int> setWater(int glasses) async {
+    final data = await _api.post('/me/water', {'glasses': glasses})
+        as Map<String, dynamic>;
+    return (data['glasses'] as num?)?.toInt() ?? glasses;
+  }
 }
 
 /// Демо-реализация (без бэкенда).
@@ -534,4 +549,15 @@ class DemoEngagementService implements EngagementService {
         Insight(text: 'До месячных ~2 дн. — подготовьтесь заранее.', emoji: '🩸'),
         Insight(text: 'Отличная серия — так держать 💪', emoji: '🔥'),
       ];
+
+  int _water = 3;
+
+  @override
+  Future<int> waterToday() async => _water;
+
+  @override
+  Future<int> setWater(int glasses) async {
+    _water = glasses.clamp(0, 30);
+    return _water;
+  }
 }

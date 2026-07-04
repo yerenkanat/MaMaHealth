@@ -44,6 +44,8 @@ class _DailyLogScreenState extends State<DailyLogScreen> {
   final Set<String> _symptoms = {};
   final _note = TextEditingController();
   bool _saving = false;
+  int _water = 0;
+  static const _waterGoal = 8;
   Future<List<DailyLog>>? _history;
 
   String get _today {
@@ -58,7 +60,8 @@ class _DailyLogScreenState extends State<DailyLogScreen> {
   }
 
   Future<void> _load() async {
-    final future = context.read<EngagementService>().dailyLogs();
+    final svc = context.read<EngagementService>();
+    final future = svc.dailyLogs();
     setState(() {
       _history = future;
     });
@@ -76,6 +79,23 @@ class _DailyLogScreenState extends State<DailyLogScreen> {
       }
     } catch (_) {
       // офлайн — оставляем пустую форму
+    }
+    try {
+      final w = await svc.waterToday();
+      if (mounted) setState(() => _water = w);
+    } catch (_) {
+      // офлайн — вода 0
+    }
+  }
+
+  Future<void> _changeWater(int delta) async {
+    final next = (_water + delta).clamp(0, 30);
+    if (next == _water) return;
+    setState(() => _water = next);
+    try {
+      await context.read<EngagementService>().setWater(next);
+    } catch (_) {
+      // молча — локально уже обновлено
     }
   }
 
@@ -117,6 +137,13 @@ class _DailyLogScreenState extends State<DailyLogScreen> {
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
+          _WaterCard(
+            glasses: _water,
+            goal: _waterGoal,
+            onAdd: () => _changeWater(1),
+            onRemove: () => _changeWater(-1),
+          ),
+          const SizedBox(height: 24),
           const Text('Как ты себя чувствуешь сегодня?',
               style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700)),
           const SizedBox(height: 12),
@@ -227,6 +254,87 @@ class _MoodButton extends StatelessWidget {
                   fontSize: 11,
                   color: selected ? const Color(0xFF6A4BD0) : Colors.black45,
                   fontWeight: selected ? FontWeight.w700 : FontWeight.w400)),
+        ],
+      ),
+    );
+  }
+}
+
+class _WaterCard extends StatelessWidget {
+  const _WaterCard({
+    required this.glasses,
+    required this.goal,
+    required this.onAdd,
+    required this.onRemove,
+  });
+
+  final int glasses;
+  final int goal;
+  final VoidCallback onAdd;
+  final VoidCallback onRemove;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(16),
+        color: const Color(0xFFE3F2FD),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              const Icon(Icons.local_drink, color: Color(0xFF2A93D5)),
+              const SizedBox(width: 8),
+              const Text('Вода сегодня',
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700)),
+              const Spacer(),
+              Text('$glasses / $goal',
+                  style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w700,
+                      color: Color(0xFF2A93D5))),
+            ],
+          ),
+          const SizedBox(height: 12),
+          Row(
+            children: [
+              Expanded(
+                child: Wrap(
+                  spacing: 6,
+                  runSpacing: 6,
+                  children: [
+                    for (var i = 0; i < goal; i++)
+                      Icon(
+                        i < glasses
+                            ? Icons.local_drink
+                            : Icons.local_drink_outlined,
+                        color: i < glasses
+                            ? const Color(0xFF2A93D5)
+                            : Colors.black26,
+                        size: 22,
+                      ),
+                    if (glasses > goal)
+                      Text('+${glasses - goal}',
+                          style: const TextStyle(
+                              color: Color(0xFF2A93D5),
+                              fontWeight: FontWeight.w700)),
+                  ],
+                ),
+              ),
+              IconButton.filledTonal(
+                onPressed: glasses > 0 ? onRemove : null,
+                icon: const Icon(Icons.remove),
+              ),
+              const SizedBox(width: 6),
+              IconButton.filledTonal(
+                onPressed: onAdd,
+                icon: const Icon(Icons.add),
+              ),
+            ],
+          ),
         ],
       ),
     );
