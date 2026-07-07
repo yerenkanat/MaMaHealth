@@ -59,7 +59,9 @@ class Reminder {
         title: j['title'] as String,
         category: j['category'] as String,
         isCritical: j['isCritical'] as bool? ?? false,
-        fireDate: DateTime.tryParse(j['fireDate'] as String? ?? '') ?? DateTime.now(),
+        fireDate:
+            (DateTime.tryParse(j['fireDate'] as String? ?? '') ?? DateTime.now())
+                .toLocal(),
         profileType: j['profileType'] as String? ?? 'CHILD',
       );
 }
@@ -90,7 +92,8 @@ class KickSession {
         count: (j['count'] as num).toInt(),
         durationSeconds: (j['durationSeconds'] as num).toInt(),
         createdAt:
-            DateTime.tryParse(j['createdAt'] as String? ?? '') ?? DateTime.now(),
+            (DateTime.tryParse(j['createdAt'] as String? ?? '') ?? DateTime.now())
+                .toLocal(),
       );
 }
 
@@ -109,7 +112,8 @@ class ContractionLog {
         durationSeconds: (j['durationSeconds'] as num).toInt(),
         intervalSeconds: (j['intervalSeconds'] as num?)?.toInt(),
         createdAt:
-            DateTime.tryParse(j['createdAt'] as String? ?? '') ?? DateTime.now(),
+            (DateTime.tryParse(j['createdAt'] as String? ?? '') ?? DateTime.now())
+                .toLocal(),
       );
 }
 
@@ -201,7 +205,8 @@ class BabyEvent {
         type: j['type'] as String,
         detail: j['detail'] as String?,
         happenedAt:
-            DateTime.tryParse(j['happenedAt'] as String? ?? '') ?? DateTime.now(),
+            (DateTime.tryParse(j['happenedAt'] as String? ?? '') ?? DateTime.now())
+                .toLocal(),
       );
 }
 

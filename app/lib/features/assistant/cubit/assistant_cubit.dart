@@ -39,6 +39,9 @@ class AssistantCubit extends Cubit<AssistantState> {
     try {
       final turns = await _engagement.chatHistory();
       if (turns.isEmpty) return;
+      // Если пользователь уже начал переписку (пока грузилась история) —
+      // не затираем его сообщения загруженной историей.
+      if (state.messages.length > 1 || state.sending) return;
       emit(state.copyWith(messages: [
         _greeting,
         for (final t in turns)

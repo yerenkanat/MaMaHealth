@@ -67,7 +67,8 @@ class _DailyLogScreenState extends State<DailyLogScreen> {
     });
     try {
       final logs = await future;
-      final today = logs.where((l) => l.date == _today).firstOrNull;
+      final matches = logs.where((l) => l.date == _today);
+      final today = matches.isEmpty ? null : matches.first;
       if (today != null && mounted) {
         setState(() {
           _mood = today.mood;
