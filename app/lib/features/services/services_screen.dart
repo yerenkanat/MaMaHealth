@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../core/theme/app_theme.dart';
 import 'baby/newborn_tracker_screen.dart';
 import 'blood/blood_type_screen.dart';
 import 'calendars/calendar_screens.dart';
@@ -44,7 +45,18 @@ class ServicesScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Сервисы')),
+      appBar: AppBar(
+        title: const Text('Сервисы'),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.search),
+            tooltip: 'Поиск по сервисам',
+            onPressed: () =>
+                showSearch(context: context, delegate: _ServiceSearchDelegate()),
+          ),
+          const SizedBox(width: 8),
+        ],
+      ),
       body: GridView.count(
         padding: const EdgeInsets.all(16),
         crossAxisCount: 2,
@@ -57,6 +69,74 @@ class ServicesScreen extends StatelessWidget {
       ),
     );
   }
+}
+
+/// Поиск по сервисам (встроенный SearchDelegate).
+class _ServiceSearchDelegate extends SearchDelegate<void> {
+  @override
+  String get searchFieldLabel => 'Найти сервис';
+
+  List<_Service> _matches() {
+    final q = query.trim().toLowerCase();
+    if (q.isEmpty) return ServicesScreen._services;
+    return ServicesScreen._services
+        .where((s) => s.title.toLowerCase().contains(q))
+        .toList();
+  }
+
+  Widget _list(BuildContext context) {
+    final items = _matches();
+    if (items.isEmpty) {
+      return const Center(
+        child: Padding(
+          padding: EdgeInsets.all(32),
+          child: Text('Ничего не найдено',
+              style: TextStyle(color: AppColors.inkMuted)),
+        ),
+      );
+    }
+    return ListView(
+      children: [
+        for (final s in items)
+          ListTile(
+            leading: CircleAvatar(
+              backgroundColor: s.color,
+              child: Icon(s.icon, color: Colors.black87, size: 20),
+            ),
+            title: Text(s.title),
+            onTap: () {
+              close(context, null);
+              Navigator.of(context).push(
+                MaterialPageRoute(builder: (_) => _screenFor(s.title)),
+              );
+            },
+          ),
+      ],
+    );
+  }
+
+  @override
+  List<Widget> buildActions(BuildContext context) => [
+        if (query.isNotEmpty)
+          IconButton(
+            icon: const Icon(Icons.clear),
+            tooltip: 'Очистить',
+            onPressed: () => query = '',
+          ),
+      ];
+
+  @override
+  Widget buildLeading(BuildContext context) => IconButton(
+        icon: const Icon(Icons.arrow_back),
+        tooltip: 'Назад',
+        onPressed: () => close(context, null),
+      );
+
+  @override
+  Widget buildResults(BuildContext context) => _list(context);
+
+  @override
+  Widget buildSuggestions(BuildContext context) => _list(context);
 }
 
 /// Маршрутизация плитки на реальный экран (или заглушку).
