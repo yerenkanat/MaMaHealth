@@ -55,7 +55,10 @@ class _VideoCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
+    return Semantics(
+      button: true,
+      label: 'Видео: ${video.title}. Открыть на YouTube',
+      child: GestureDetector(
       onTap: () => _open(context),
       child: Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -111,6 +114,7 @@ class _VideoCard extends StatelessWidget {
         Text(video.title,
             style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w700)),
       ],
+      ),
       ),
     );
   }

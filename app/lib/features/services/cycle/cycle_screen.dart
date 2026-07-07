@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../../core/theme/app_theme.dart';
 import '../../engagement/engagement_service.dart';
 
 /// «Мой цикл» — трекинг месячных как в Flo: прогноз следующих,
@@ -267,7 +268,7 @@ class _PmsCard extends StatelessWidget {
         children: [
           const Row(
             children: [
-              Icon(Icons.insights, size: 20, color: Color(0xFFFF6B81)),
+              Icon(Icons.insights, size: 20, color: AppColors.pink),
               SizedBox(width: 8),
               Text('Симптомы перед месячными',
                   style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700)),
@@ -465,14 +466,14 @@ class _DayCell extends StatelessWidget {
     Color fg = Colors.black87;
     switch (phase) {
       case _Phase.period:
-        bg = const Color(0xFFFF6B81);
+        bg = AppColors.pink;
         fg = Colors.white;
         break;
       case _Phase.predictedPeriod:
         bg = const Color(0xFFFFD5DC);
         break;
       case _Phase.ovulation:
-        bg = const Color(0xFF3EC98A);
+        bg = AppColors.success;
         fg = Colors.white;
         break;
       case _Phase.fertile:
@@ -489,7 +490,7 @@ class _DayCell extends StatelessWidget {
           color: bg,
           shape: BoxShape.circle,
           border: isToday
-              ? Border.all(color: const Color(0xFF6A4BD0), width: 2)
+              ? Border.all(color: AppColors.primaryDeep, width: 2)
               : null,
         ),
         child: Text('$day', style: TextStyle(color: fg, fontSize: 13)),
@@ -519,9 +520,9 @@ class _Legend extends StatelessWidget {
       spacing: 16,
       runSpacing: 8,
       children: [
-        item(const Color(0xFFFF6B81), 'Месячные'),
+        item(AppColors.pink, 'Месячные'),
         item(const Color(0xFFFFD5DC), 'Прогноз'),
-        item(const Color(0xFF3EC98A), 'Овуляция'),
+        item(AppColors.success, 'Овуляция'),
         item(const Color(0xFFD5F2E4), 'Фертильные дни'),
       ],
     );
@@ -553,7 +554,7 @@ class _History extends StatelessWidget {
             child: ListTile(
               leading: const CircleAvatar(
                 backgroundColor: Color(0xFFFFE0E6),
-                child: Icon(Icons.water_drop, color: Color(0xFFFF6B81)),
+                child: Icon(Icons.water_drop, color: AppColors.pink),
               ),
               title: Text(periods[i].end == null
                   ? 'С ${fmt(periods[i].start)}'

@@ -157,7 +157,10 @@ class _InsightBar extends StatelessWidget {
         separatorBuilder: (_, __) => const SizedBox(width: 10),
         itemBuilder: (_, i) {
           final ins = insights[i];
-          return GestureDetector(
+          return Semantics(
+            button: true,
+            label: 'Подсказка: ${ins.text}. Спросить ассистента',
+            child: GestureDetector(
             onTap: () => onTap(ins.text),
             child: Container(
               width: 240,
@@ -180,6 +183,7 @@ class _InsightBar extends StatelessWidget {
                   ),
                 ],
               ),
+            ),
             ),
           );
         },

@@ -3,10 +3,18 @@ import 'package:flutter/material.dart';
 /// Свежая пастель + сочные градиенты. Крупная типографика, большие скругления.
 class AppColors {
   static const bg = Color(0xFFF3F4FB);      // прохладный светлый фон
+  static const surface = Colors.white;       // фон карточек
   static const ink = Color(0xFF2A2440);      // тёмный текст
+  static const inkMuted = Color(0xFF6E6A80); // приглушённый текст (контраст ≥4.5:1 на белом)
   static const lavender = Color(0xFF8B7BF0);
   static const mint = Color(0xFF39C6A8);
   static const peach = Color(0xFFFF9E7A);
+
+  // Семантические токены (вместо сырого hex по экранам)
+  static const primaryDeep = Color(0xFF6A4BD0); // акцент/иконки
+  static const pink = Color(0xFFFF6B81);         // цикл/месячные
+  static const water = Color(0xFF2A93D5);        // вода/гидратация
+  static const success = Color(0xFF2E9E6E);      // выполнено/овуляция
 }
 
 class AppGradients {

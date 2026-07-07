@@ -327,11 +327,13 @@ class _WaterCard extends StatelessWidget {
               ),
               IconButton.filledTonal(
                 onPressed: glasses > 0 ? onRemove : null,
+                tooltip: 'Убрать стакан',
                 icon: const Icon(Icons.remove),
               ),
               const SizedBox(width: 6),
               IconButton.filledTonal(
                 onPressed: onAdd,
+                tooltip: 'Добавить стакан',
                 icon: const Icon(Icons.add),
               ),
             ],
