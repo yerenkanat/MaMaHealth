@@ -72,7 +72,7 @@ class _JourneyTimelineState extends State<JourneyTimeline> {
                 boxShadow: isActive
                     ? [
                         BoxShadow(
-                          color: const Color(0xFF8B7BF0).withValues(alpha: 0.35),
+                          color: AppColors.lavender.withValues(alpha: 0.35),
                           blurRadius: 22,
                           offset: const Offset(0, 10),
                         )

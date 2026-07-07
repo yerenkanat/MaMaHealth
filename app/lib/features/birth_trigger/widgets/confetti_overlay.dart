@@ -1,4 +1,5 @@
 import 'dart:math';
+import '../../../core/theme/app_theme.dart';
 import 'package:flutter/material.dart';
 
 /// Полноэкранное конфетти для момента «Я родила!». Само удаляется по завершении.
@@ -42,8 +43,8 @@ class _ConfettiLayerState extends State<_ConfettiLayer>
   late final List<_Particle> _parts;
 
   static const _colors = [
-    Color(0xFF8B7BF0),
-    Color(0xFF39C6A8),
+    AppColors.lavender,
+    AppColors.mint,
     Color(0xFFFF8F6B),
     Color(0xFFFFC79E),
     Color(0xFF6FD6C1),

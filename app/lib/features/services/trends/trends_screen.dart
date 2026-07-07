@@ -249,12 +249,12 @@ class _MoodTrendCard extends StatelessWidget {
                   LineChartBarData(
                     spots: spots,
                     isCurved: true,
-                    color: const Color(0xFF8B7BF0),
+                    color: AppColors.lavender,
                     barWidth: 3,
                     dotData: const FlDotData(show: true),
                     belowBarData: BarAreaData(
                       show: true,
-                      color: const Color(0xFF8B7BF0).withValues(alpha: 0.12),
+                      color: AppColors.lavender.withValues(alpha: 0.12),
                     ),
                   ),
                 ],
@@ -309,7 +309,7 @@ class _SymptomsCard extends StatelessWidget {
                               value: e.value / maxCount,
                               minHeight: 12,
                               backgroundColor: const Color(0xFFF1EEF7),
-                              color: const Color(0xFFFF9E7A),
+                              color: AppColors.peach,
                             ),
                           ),
                         ),

@@ -152,7 +152,7 @@ class _ContractionScreenState extends State<ContractionScreen> {
                   BoxShadow(
                     color: (_running
                             ? const Color(0xFFFF8F6B)
-                            : const Color(0xFF8B7BF0))
+                            : AppColors.lavender)
                         .withValues(alpha: 0.4),
                     blurRadius: 30,
                     spreadRadius: 2,

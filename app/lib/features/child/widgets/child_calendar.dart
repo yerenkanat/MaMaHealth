@@ -64,7 +64,7 @@ class _HeroCard extends StatelessWidget {
         gradient: AppGradients.mint,
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFF39C6A8).withValues(alpha: 0.30),
+            color: AppColors.mint.withValues(alpha: 0.30),
             blurRadius: 26,
             offset: const Offset(0, 12),
           ),

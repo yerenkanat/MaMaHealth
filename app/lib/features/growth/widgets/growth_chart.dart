@@ -1,4 +1,5 @@
 import 'package:fl_chart/fl_chart.dart';
+import '../../../core/theme/app_theme.dart';
 import 'package:flutter/material.dart';
 
 import '../../../data/who_growth_data.dart';
@@ -77,7 +78,7 @@ class GrowthChart extends StatelessWidget {
         lineBarsData: [
           _ref(ref.p97, const Color(0xFFCFC9F2)),
           _ref(ref.p3, const Color(0xFFCFC9F2)),
-          _ref(ref.p50, const Color(0xFF8B7BF0), dashed: true),
+          _ref(ref.p50, AppColors.lavender, dashed: true),
           LineChartBarData(
             spots: childSpots,
             isCurved: true,

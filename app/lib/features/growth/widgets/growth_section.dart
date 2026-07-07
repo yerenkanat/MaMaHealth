@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../core/theme/app_theme.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -89,7 +90,7 @@ class _Legend extends StatelessWidget {
         spacing: 14,
         children: [
           _dot(const Color(0xFFCFC9F2), 'коридор P3–P97'),
-          _dot(const Color(0xFF8B7BF0), 'медиана ВОЗ'),
+          _dot(AppColors.lavender, 'медиана ВОЗ'),
           _dot(primary, 'ваш малыш'),
         ],
       ),
