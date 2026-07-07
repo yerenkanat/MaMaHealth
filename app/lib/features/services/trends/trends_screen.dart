@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../core/theme/app_theme.dart';
+import '../../../core/widgets/async_error_view.dart';
 import '../../engagement/engagement_service.dart';
 
 /// «Мои тренды» — превращает накопленные логи в инсайты:
@@ -90,7 +91,9 @@ class _TrendsScreenState extends State<TrendsScreen> {
             return const Center(child: CircularProgressIndicator());
           }
           if (snap.hasError || !snap.hasData) {
-            return Center(child: Text('Не удалось загрузить: ${snap.error}'));
+            return AsyncErrorView(
+              onRetry: () => setState(() => _future = _load()),
+            );
           }
           final d = snap.data!;
           final hasAny =

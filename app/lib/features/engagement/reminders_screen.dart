@@ -1,12 +1,26 @@
 import 'package:flutter/material.dart';
-import '../../core/theme/app_theme.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../core/theme/app_theme.dart';
+import '../../core/widgets/async_error_view.dart';
 import 'engagement_service.dart';
 
 /// Инбокс медицинских напоминаний (скрининги, прививки, осмотры).
-class RemindersScreen extends StatelessWidget {
+class RemindersScreen extends StatefulWidget {
   const RemindersScreen({super.key});
+
+  @override
+  State<RemindersScreen> createState() => _RemindersScreenState();
+}
+
+class _RemindersScreenState extends State<RemindersScreen> {
+  Future<List<Reminder>>? _future;
+
+  @override
+  void initState() {
+    super.initState();
+    _future = context.read<EngagementService>().reminders();
+  }
 
   IconData _icon(String category) => switch (category) {
         'vaccination' => Icons.vaccines,
@@ -23,13 +37,16 @@ class RemindersScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(title: const Text('Напоминания')),
       body: FutureBuilder<List<Reminder>>(
-        future: context.read<EngagementService>().reminders(),
+        future: _future,
         builder: (context, snap) {
           if (snap.connectionState != ConnectionState.done) {
             return const Center(child: CircularProgressIndicator());
           }
           if (snap.hasError) {
-            return Center(child: Text('Ошибка: ${snap.error}'));
+            return AsyncErrorView(
+              onRetry: () => setState(() =>
+                  _future = context.read<EngagementService>().reminders()),
+            );
           }
           final items = snap.data ?? const [];
           if (items.isEmpty) {

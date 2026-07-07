@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
-import '../../../core/theme/app_theme.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../../core/theme/app_theme.dart';
+import '../../../core/widgets/async_error_view.dart';
 import '../../engagement/engagement_service.dart';
 
 /// «Отчёт для врача» — сводка всех трекеров (вес, шевеления, схватки,
@@ -183,7 +184,9 @@ class _DoctorReportScreenState extends State<DoctorReportScreen> {
             return const Center(child: CircularProgressIndicator());
           }
           if (snap.hasError || !snap.hasData) {
-            return Center(child: Text('Не удалось загрузить: ${snap.error}'));
+            return AsyncErrorView(
+              onRetry: () => setState(() => _future = _load()),
+            );
           }
           final d = snap.data!;
           return Column(
