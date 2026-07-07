@@ -15,8 +15,9 @@ app/.packages
 app/pubspec.lock
 *.iml
 
-# Claude Code
-.claude/
+# Claude Code (ignore machine-local settings, but track shared skills)
+.claude/*
+!.claude/skills/
 
 # IDE / OS
 .idea/
