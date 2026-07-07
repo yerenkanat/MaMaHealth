@@ -103,7 +103,10 @@ class _WeightMonitorScreenState extends State<WeightMonitorScreen> {
             ),
           ),
           Expanded(
-            child: Padding(
+            child: Semantics(
+              label:
+                  'График прибавки веса. Текущая прибавка ${_lastGain.toStringAsFixed(1)} кг',
+              child: Padding(
               padding: const EdgeInsets.fromLTRB(8, 8, 16, 16),
               child: LineChart(
                 LineChartData(
@@ -167,6 +170,7 @@ class _WeightMonitorScreenState extends State<WeightMonitorScreen> {
                   ],
                 ),
               ),
+            ),
             ),
           ),
           const Padding(

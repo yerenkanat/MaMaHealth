@@ -37,6 +37,16 @@ const _moodEmojiByScore = <int, String>{
   5: '😄',
 };
 
+const _moodWordByScore = <int, String>{
+  1: 'плохо',
+  2: 'так себе',
+  3: 'нормально',
+  4: 'хорошо',
+  5: 'отлично',
+};
+
+String _moodLabel(int score) => _moodWordByScore[score] ?? 'нормально';
+
 const _symptomRu = <String, String>{
   'nausea': 'Тошнота',
   'fatigue': 'Усталость',
@@ -206,7 +216,10 @@ class _MoodTrendCard extends StatelessWidget {
           Text('В среднем: ${_moodEmojiByScore[avg.round()]} ',
               style: const TextStyle(color: Colors.black54)),
           const SizedBox(height: 12),
-          SizedBox(
+          Semantics(
+            label:
+                'График настроения за ${recent.length} дней, в среднем ${_moodLabel(avg.round())}',
+            child: SizedBox(
             height: 140,
             child: LineChart(
               LineChartData(
@@ -247,6 +260,7 @@ class _MoodTrendCard extends StatelessWidget {
                 ],
               ),
             ),
+          ),
           ),
         ],
       ),
