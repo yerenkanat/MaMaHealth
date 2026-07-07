@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../core/theme/app_theme.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../engagement/engagement_service.dart';
@@ -98,7 +99,7 @@ class _DueDateScreenState extends State<DueDateScreen> {
                         fontSize: 16,
                         fontWeight:
                             _due == null ? FontWeight.w400 : FontWeight.w700,
-                        color: _due == null ? Colors.black45 : Colors.black87,
+                        color: _due == null ? AppColors.inkMuted : Colors.black87,
                       ),
                     ),
                     const Spacer(),

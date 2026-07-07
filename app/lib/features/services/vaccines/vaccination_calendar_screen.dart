@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../core/theme/app_theme.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../data/child_vaccines.dart';
@@ -112,7 +113,7 @@ class _GroupCard extends StatelessWidget {
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text('• ', style: TextStyle(color: Colors.black45)),
+                    const Text('• ', style: TextStyle(color: AppColors.inkMuted)),
                     Expanded(
                         child: Text(v,
                             style: const TextStyle(color: Colors.black87))),

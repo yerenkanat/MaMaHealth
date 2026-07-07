@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../core/theme/app_theme.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../engagement/engagement_service.dart';
@@ -75,7 +76,7 @@ class _ChatViewState extends State<_ChatView> {
           child: Padding(
             padding: EdgeInsets.only(bottom: 6),
             child: Text('умный помощник для мам',
-                style: TextStyle(fontSize: 12, color: Colors.black45)),
+                style: TextStyle(fontSize: 12, color: AppColors.inkMuted)),
           ),
         ),
       ),

@@ -177,7 +177,7 @@ class _ContractionScreenState extends State<ContractionScreen> {
           const Divider(),
           Expanded(
             child: _list.isEmpty
-                ? const Center(child: Text('Схваток пока нет', style: TextStyle(color: Colors.black45)))
+                ? const Center(child: Text('Схваток пока нет', style: TextStyle(color: AppColors.inkMuted)))
                 : ListView.separated(
                     itemCount: _list.length,
                     separatorBuilder: (_, __) => const Divider(height: 1),

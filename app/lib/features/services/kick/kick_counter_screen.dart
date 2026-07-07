@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../core/theme/app_theme.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../engagement/engagement_service.dart';
@@ -86,7 +87,7 @@ class _KickCounterScreenState extends State<KickCounterScreen> {
               _startedAt == null
                   ? '10 шевелений за ~2 часа — норма'
                   : 'В этой сессии: $_count · ${_fmt(_elapsed)}',
-              style: const TextStyle(fontSize: 13, color: Colors.black45),
+              style: const TextStyle(fontSize: 13, color: AppColors.inkMuted),
             ),
           ),
           const SizedBox(height: 20),
@@ -160,7 +161,7 @@ class _HistoryList extends StatelessWidget {
           return const Padding(
             padding: EdgeInsets.symmetric(horizontal: 20, vertical: 12),
             child: Text('Пока нет сохранённых сессий',
-                style: TextStyle(color: Colors.black45)),
+                style: TextStyle(color: AppColors.inkMuted)),
           );
         }
         return Column(
@@ -175,7 +176,7 @@ class _HistoryList extends StatelessWidget {
                 subtitle: Text(_KickCounterScreenState._fmt(
                     Duration(seconds: k.durationSeconds))),
                 trailing: Text(_date(k.createdAt),
-                    style: const TextStyle(color: Colors.black45, fontSize: 13)),
+                    style: const TextStyle(color: AppColors.inkMuted, fontSize: 13)),
               ),
           ],
         );

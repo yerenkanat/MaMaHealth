@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../core/theme/app_theme.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'engagement_service.dart';
@@ -73,7 +74,7 @@ class RemindersScreen extends StatelessWidget {
                                   fontWeight: FontWeight.w700, fontSize: 15)),
                           const SizedBox(height: 2),
                           Text(_when(r.fireDate),
-                              style: const TextStyle(color: Colors.black45, fontSize: 13)),
+                              style: const TextStyle(color: AppColors.inkMuted, fontSize: 13)),
                         ],
                       ),
                     ),

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../core/theme/app_theme.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -299,7 +300,7 @@ class _Header extends StatelessWidget {
               Text(me.city!, style: const TextStyle(color: Colors.black54)),
             const SizedBox(height: 4),
             const Text('Сводка трекеров MaMa для приёма у врача',
-                style: TextStyle(color: Colors.black45, fontSize: 13)),
+                style: TextStyle(color: AppColors.inkMuted, fontSize: 13)),
           ],
         ),
       ),

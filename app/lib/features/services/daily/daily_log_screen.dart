@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../core/theme/app_theme.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../engagement/engagement_service.dart';
@@ -253,7 +254,7 @@ class _MoodButton extends StatelessWidget {
           Text(label,
               style: TextStyle(
                   fontSize: 11,
-                  color: selected ? const Color(0xFF6A4BD0) : Colors.black45,
+                  color: selected ? const Color(0xFF6A4BD0) : AppColors.inkMuted,
                   fontWeight: selected ? FontWeight.w700 : FontWeight.w400)),
         ],
       ),
@@ -364,7 +365,7 @@ class _HistoryList extends StatelessWidget {
         if (items.isEmpty) {
           return const Padding(
             padding: EdgeInsets.symmetric(vertical: 12),
-            child: Text('Пока нет записей', style: TextStyle(color: Colors.black45)),
+            child: Text('Пока нет записей', style: TextStyle(color: AppColors.inkMuted)),
           );
         }
         return Column(

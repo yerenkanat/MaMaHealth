@@ -436,7 +436,7 @@ class _MonthCalendar extends StatelessWidget {
                   child: Center(
                     child: Text(w,
                         style: const TextStyle(
-                            fontSize: 12, color: Colors.black45)),
+                            fontSize: 12, color: AppColors.inkMuted)),
                   ),
                 ),
             ],

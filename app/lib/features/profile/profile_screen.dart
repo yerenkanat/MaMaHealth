@@ -116,7 +116,7 @@ class _HeaderCard extends StatelessWidget {
                       color: Color(0xFFE07B39), fontWeight: FontWeight.w600)),
             ),
             const SizedBox(height: 8),
-            Text(me?.city ?? '—', style: const TextStyle(color: Colors.black45)),
+            Text(me?.city ?? '—', style: const TextStyle(color: AppColors.inkMuted)),
             const SizedBox(height: 4),
             Text(me?.name ?? 'Мама',
                 style:
@@ -130,7 +130,7 @@ class _HeaderCard extends StatelessWidget {
                     Icon(Icons.emoji_emotions_outlined, color: Color(0xFF6A4BD0)),
               ),
               title: Text('Мой статус',
-                  style: TextStyle(color: Colors.black45, fontSize: 13)),
+                  style: TextStyle(color: AppColors.inkMuted, fontSize: 13)),
               subtitle: Text('Я мама',
                   style: TextStyle(color: Colors.black87, fontSize: 16)),
               trailing: Icon(Icons.unfold_more),

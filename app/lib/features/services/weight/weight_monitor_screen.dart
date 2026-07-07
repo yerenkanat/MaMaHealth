@@ -1,4 +1,5 @@
 import 'package:fl_chart/fl_chart.dart';
+import '../../../core/theme/app_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -171,7 +172,7 @@ class _WeightMonitorScreenState extends State<WeightMonitorScreen> {
           const Padding(
             padding: EdgeInsets.only(bottom: 12),
             child: Text('Зелёный коридор — рекомендуемая прибавка (норм. ИМТ)',
-                style: TextStyle(fontSize: 12, color: Colors.black45)),
+                style: TextStyle(fontSize: 12, color: AppColors.inkMuted)),
           ),
         ],
       ),

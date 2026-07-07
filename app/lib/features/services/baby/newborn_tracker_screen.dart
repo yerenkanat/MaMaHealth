@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../core/theme/app_theme.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -126,7 +127,7 @@ class _NewbornTrackerScreenState extends State<NewbornTrackerScreen> {
                 const Padding(
                   padding: EdgeInsets.symmetric(vertical: 12),
                   child: Text('Сегодня событий пока нет.',
-                      style: TextStyle(color: Colors.black45)),
+                      style: TextStyle(color: AppColors.inkMuted)),
                 )
               else
                 for (final e in todays) _EventTile(event: e),
@@ -210,7 +211,7 @@ class _Stat extends StatelessWidget {
         Text('$value',
             style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w800)),
         Text(label,
-            style: const TextStyle(fontSize: 12, color: Colors.black45)),
+            style: const TextStyle(fontSize: 12, color: AppColors.inkMuted)),
       ],
     );
   }
@@ -277,7 +278,7 @@ class _EventTile extends StatelessWidget {
         ),
         title: Text(_eventTitle(event)),
         trailing: Text(_time(event.happenedAt),
-            style: const TextStyle(color: Colors.black45)),
+            style: const TextStyle(color: AppColors.inkMuted)),
       ),
     );
   }
