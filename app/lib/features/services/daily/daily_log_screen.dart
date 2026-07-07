@@ -245,7 +245,7 @@ class _MoodButton extends StatelessWidget {
                   ? const Color(0xFFE7E0FB)
                   : const Color(0xFFF3F4FB),
               border: selected
-                  ? Border.all(color: const Color(0xFF6A4BD0), width: 2)
+                  ? Border.all(color: AppColors.primaryDeep, width: 2)
                   : null,
             ),
             child: Text(emoji, style: const TextStyle(fontSize: 26)),
@@ -254,7 +254,7 @@ class _MoodButton extends StatelessWidget {
           Text(label,
               style: TextStyle(
                   fontSize: 11,
-                  color: selected ? const Color(0xFF6A4BD0) : AppColors.inkMuted,
+                  color: selected ? AppColors.primaryDeep : AppColors.inkMuted,
                   fontWeight: selected ? FontWeight.w700 : FontWeight.w400)),
         ],
       ),
@@ -288,7 +288,7 @@ class _WaterCard extends StatelessWidget {
         children: [
           Row(
             children: [
-              const Icon(Icons.local_drink, color: Color(0xFF2A93D5)),
+              const Icon(Icons.local_drink, color: AppColors.water),
               const SizedBox(width: 8),
               const Text('Вода сегодня',
                   style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700)),
@@ -297,7 +297,7 @@ class _WaterCard extends StatelessWidget {
                   style: const TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w700,
-                      color: Color(0xFF2A93D5))),
+                      color: AppColors.water)),
             ],
           ),
           const SizedBox(height: 12),
@@ -314,14 +314,14 @@ class _WaterCard extends StatelessWidget {
                             ? Icons.local_drink
                             : Icons.local_drink_outlined,
                         color: i < glasses
-                            ? const Color(0xFF2A93D5)
+                            ? AppColors.water
                             : Colors.black26,
                         size: 22,
                       ),
                     if (glasses > goal)
                       Text('+${glasses - goal}',
                           style: const TextStyle(
-                              color: Color(0xFF2A93D5),
+                              color: AppColors.water,
                               fontWeight: FontWeight.w700)),
                   ],
                 ),

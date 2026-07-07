@@ -127,7 +127,7 @@ class _HeaderCard extends StatelessWidget {
               leading: CircleAvatar(
                 backgroundColor: Color(0xFFE7E0FB),
                 child:
-                    Icon(Icons.emoji_emotions_outlined, color: Color(0xFF6A4BD0)),
+                    Icon(Icons.emoji_emotions_outlined, color: AppColors.primaryDeep),
               ),
               title: Text('Мой статус',
                   style: TextStyle(color: AppColors.inkMuted, fontSize: 13)),
@@ -222,7 +222,7 @@ class _PointsCard extends StatelessWidget {
             const SizedBox(height: 12),
             const Text('Получите 500 бонусов',
                 style: TextStyle(
-                    color: Color(0xFF6A4BD0), fontWeight: FontWeight.w700)),
+                    color: AppColors.primaryDeep, fontWeight: FontWeight.w700)),
             const SizedBox(height: 6),
             Row(
               children: [
@@ -266,7 +266,7 @@ class _TrendsCard extends StatelessWidget {
             children: [
               const CircleAvatar(
                 backgroundColor: Colors.white,
-                child: Icon(Icons.insights, color: Color(0xFF2E9E6E)),
+                child: Icon(Icons.insights, color: AppColors.success),
               ),
               const SizedBox(width: 14),
               Expanded(

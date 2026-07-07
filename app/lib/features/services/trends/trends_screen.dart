@@ -2,6 +2,7 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../../core/theme/app_theme.dart';
 import '../../engagement/engagement_service.dart';
 
 /// «Мои тренды» — превращает накопленные логи в инсайты:
@@ -147,7 +148,7 @@ class _Card extends StatelessWidget {
           children: [
             Row(
               children: [
-                Icon(icon, size: 20, color: const Color(0xFF6A4BD0)),
+                Icon(icon, size: 20, color: AppColors.primaryDeep),
                 const SizedBox(width: 8),
                 Text(title,
                     style: const TextStyle(

@@ -35,7 +35,7 @@ class VaccinationCalendarScreen extends StatelessWidget {
                 ),
                 child: Row(
                   children: [
-                    const Icon(Icons.info_outline, color: Color(0xFF6A4BD0)),
+                    const Icon(Icons.info_outline, color: AppColors.primaryDeep),
                     const SizedBox(width: 10),
                     Expanded(
                       child: Text(
@@ -89,8 +89,8 @@ class _GroupCard extends StatelessWidget {
                     done ? Icons.check : Icons.vaccines,
                     size: 18,
                     color: done
-                        ? const Color(0xFF2E9E6E)
-                        : const Color(0xFF6A4BD0),
+                        ? AppColors.success
+                        : AppColors.primaryDeep,
                   ),
                 ),
                 const SizedBox(width: 12),
@@ -101,7 +101,7 @@ class _GroupCard extends StatelessWidget {
                 if (done)
                   const Text('пройдено',
                       style: TextStyle(
-                          color: Color(0xFF2E9E6E),
+                          color: AppColors.success,
                           fontSize: 12,
                           fontWeight: FontWeight.w600)),
               ],

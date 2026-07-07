@@ -62,7 +62,7 @@ class RemindersScreen extends StatelessWidget {
                       child: Icon(_icon(r.category),
                           color: r.isCritical
                               ? const Color(0xFFD53A5E)
-                              : const Color(0xFF6A4BD0)),
+                              : AppColors.primaryDeep),
                     ),
                     const SizedBox(width: 14),
                     Expanded(

@@ -91,7 +91,7 @@ class _DueDateScreenState extends State<DueDateScreen> {
                 ),
                 child: Row(
                   children: [
-                    const Icon(Icons.event, color: Color(0xFF6A4BD0)),
+                    const Icon(Icons.event, color: AppColors.primaryDeep),
                     const SizedBox(width: 12),
                     Text(
                       _due == null ? 'Выбрать дату' : _fmt(_due!),

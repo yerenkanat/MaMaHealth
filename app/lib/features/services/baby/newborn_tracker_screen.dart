@@ -206,7 +206,7 @@ class _Stat extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        Icon(icon, color: const Color(0xFF6A4BD0)),
+        Icon(icon, color: AppColors.primaryDeep),
         const SizedBox(height: 6),
         Text('$value',
             style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w800)),
@@ -274,7 +274,7 @@ class _EventTile extends StatelessWidget {
       child: ListTile(
         leading: CircleAvatar(
           backgroundColor: const Color(0xFFF1EEF7),
-          child: Icon(_eventIcon(event.type), color: const Color(0xFF6A4BD0)),
+          child: Icon(_eventIcon(event.type), color: AppColors.primaryDeep),
         ),
         title: Text(_eventTitle(event)),
         trailing: Text(_time(event.happenedAt),

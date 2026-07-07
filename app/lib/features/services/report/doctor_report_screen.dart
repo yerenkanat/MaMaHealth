@@ -329,7 +329,7 @@ class _Section extends StatelessWidget {
           children: [
             Row(
               children: [
-                Icon(icon, size: 20, color: const Color(0xFF6A4BD0)),
+                Icon(icon, size: 20, color: AppColors.primaryDeep),
                 const SizedBox(width: 8),
                 Text(title,
                     style: const TextStyle(
